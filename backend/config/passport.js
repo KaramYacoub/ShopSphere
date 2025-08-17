@@ -9,7 +9,11 @@ const googleConfig = {
   userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo",
 };
 
-if (!googleConfig.clientID || !googleConfig.clientSecret) {
+if (
+  !googleConfig.clientID ||
+  !googleConfig.clientSecret ||
+  !googleConfig.callbackURL
+) {
   throw new Error("Missing Google OAuth credentials in environment variables");
 }
 
@@ -36,11 +40,3 @@ passport.use(
     }
   )
 );
-
-passport.serializeUser((user, cb) => {
-  cb(null, user);
-});
-
-passport.deserializeUser((user, cb) => {
-  cb(null, user);
-});

@@ -2,7 +2,17 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import passport from "passport";
 import User from "../models/user.js";
+import nodemailer from "nodemailer";
 
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASSWORD,
+  },
+});
+
+// email/password signup
 export async function signup(req, res) {
   try {
     const { name, email, password } = req.body;
@@ -32,25 +42,47 @@ export async function signup(req, res) {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = await User.create({ name, email, password: hashedPassword });
-
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
+    const user = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+      isVerified: false,
     });
 
-    res.cookie("token", token, {
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-      httpOnly: true,
-      sameSite: "strict",
-      secure: process.env.NODE_ENV === "production",
+    // create verification token (JWT or random string)
+    const verificationToken = jwt.sign(
+      { id: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" }
+    );
+
+    // verification link
+    const verificationLink = `${process.env.FRONTEND_URL}/verify-email?token=${verificationToken}`;
+
+    console.log(verificationLink);
+
+    // send email
+    await transporter.sendMail({
+      from: `"ShopSphere" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: "Verify your email",
+      html: `<p>Hello ${name},</p>
+             <p>Click below to verify your email:</p>
+             <a href="${verificationLink}">Verify Email</a>`,
     });
-    res.status(201).json({ success: true, user });
+
+    res.status(201).json({
+      success: true,
+      message:
+        "Signup successful. Please check your email to verify your account.",
+    });
   } catch (error) {
     console.error("Error in signup controller:", error.message);
     res.status(500).json({ message: "Internal server error" });
   }
 }
 
+// email/password login
 export async function login(req, res) {
   try {
     const { email, password } = req.body;
@@ -67,6 +99,12 @@ export async function login(req, res) {
     if (!isMatch)
       return res.status(400).json({ message: "Invalid credentials" });
 
+    if (!user.isVerified) {
+      return res
+        .status(401)
+        .json({ message: "Please verify your email first" });
+    }
+
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "7d",
     });
@@ -74,7 +112,7 @@ export async function login(req, res) {
     res.cookie("token", token, {
       maxAge: 7 * 24 * 60 * 60 * 1000,
       httpOnly: true,
-      sameSite: "strict",
+      sameSite: "none",
       secure: process.env.NODE_ENV === "production",
     });
 
@@ -85,6 +123,7 @@ export async function login(req, res) {
   }
 }
 
+// Google OAuth
 export const googleAuth = passport.authenticate(
   "google",
   {
@@ -99,6 +138,7 @@ export const googleAuth = passport.authenticate(
   }
 );
 
+// Google OAuth callback
 export const googleAuthCallback = (req, res, next) => {
   passport.authenticate("google", { session: false }, (err, user) => {
     if (err) {
@@ -112,16 +152,24 @@ export const googleAuthCallback = (req, res, next) => {
       expiresIn: "7d",
     });
 
-    res.json({ token, user });
+    res.cookie("token", token, {
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      httpOnly: true,
+      sameSite: "none",
+      secure: process.env.NODE_ENV === "production",
+    });
+
+    res.status(200).json({ success: true, user });
   })(req, res, next);
 };
 
+// logout
 export async function logout(req, res) {
   try {
     res.clearCookie("token", {
       httpOnly: true,
       sameSite: "none",
-      secure: true,
+      secure: process.env.NODE_ENV === "production",
       maxAge: 0,
     });
 
@@ -129,5 +177,36 @@ export async function logout(req, res) {
   } catch (error) {
     console.error("Error in logout controller:", error.message);
     return res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+export async function verifyEmail(req, res) {
+  try {
+    const { token } = req.query;
+
+    if (!token) {
+      return res.status(400).json({ message: "Invalid token" });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const user = await User.findById(decoded.id);
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+
+    if (user.isVerified) {
+      return res.status(400).json({ message: "User already verified" });
+    }
+
+    user.isVerified = true;
+    await user.save();
+
+    res
+      .status(200)
+      .json({ success: true, message: "Email verified successfully!" });
+  } catch (error) {
+    console.error("Error verifying email:", error.message);
+    res.status(500).json({ message: "Invalid or expired token" });
   }
 }

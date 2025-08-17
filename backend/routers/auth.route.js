@@ -5,6 +5,7 @@ import {
   googleAuth,
   googleAuthCallback,
   logout,
+  verifyEmail,
 } from "../controllers/auth.controller.js";
 
 const router = express.Router();
@@ -18,5 +19,7 @@ router.get("/google", googleAuth);
 router.get("/google/callback", googleAuthCallback);
 
 router.post("/logout", logout);
+
+router.get("/verify-email", verifyEmail);
 
 export default router;
