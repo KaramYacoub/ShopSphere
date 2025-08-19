@@ -1,10 +1,24 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.tsx'
+import ReactDOM from "react-dom/client";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import App from "./App.tsx";
+import "./index.css";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
+import "./i18n";
+
+const client = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      gcTime: 10000 * 60 * 60,
+    },
+  },
+});
+
+ReactDOM.createRoot(document.getElementById("root")!).render(
+  <QueryClientProvider client={client}>
     <App />
-  </StrictMode>,
-)
+
+    {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
+  </QueryClientProvider>
+);

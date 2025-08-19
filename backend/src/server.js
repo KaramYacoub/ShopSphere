@@ -6,11 +6,11 @@ import passport from "passport";
 
 import "dotenv/config";
 
-import "../config/passport.js";
+import "./config/passport.js";
 
-import connectDB from "../config/db.js";
+import connectDB from "./config/db.js";
 
-import authRouter from "../routers/auth.route.js";
+import authRouter from "./routers/auth.route.js";
 
 const PORT = process.env.PORT;
 
@@ -22,7 +22,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: ["http://localhost:5173"],
+    origin: [process.env.FRONTEND_URL],
     credentials: true,
   })
 );
