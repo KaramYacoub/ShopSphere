@@ -1,5 +1,11 @@
 import { toast } from "sonner";
-import { checkAuth, login, logout, signup, verifyEmail } from "@/lib/api";
+import {
+  checkAuth,
+  login,
+  logout,
+  signup,
+  verifyEmail,
+} from "@/lib/api/authApi";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 
@@ -110,7 +116,7 @@ export function useLogout() {
 }
 
 export function useCheckAuth() {
-  const { data, isPending, error, isError } = useQuery({
+  const { data, isPending } = useQuery({
     queryKey: ["check-auth"],
     queryFn: checkAuth,
     retry: false,
@@ -123,10 +129,8 @@ export function useCheckAuth() {
   });
 
   return {
-    isAuthenticated: !!data?.user && !isError,
+    isAuthenticated: !!data?.user,
     user: data?.user,
     isPending,
-    error,
-    isError,
   };
 }

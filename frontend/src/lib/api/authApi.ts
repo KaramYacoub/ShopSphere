@@ -31,15 +31,6 @@ export const logout = async () => {
 };
 
 export const checkAuth = async () => {
-  try {
-    const res = await axiosInstance.get("/auth/me");
-    return res.data;
-  } catch (error: any) {
-    // If it's a 401 (Unauthorized), return null instead of throwing
-    if (error.response?.status === 401) {
-      return { user: null };
-    }
-    // For other errors, throw to let React Query handle them
-    throw error;
-  }
+  const res = await axiosInstance.get("/auth/me");
+  return res.data;
 };

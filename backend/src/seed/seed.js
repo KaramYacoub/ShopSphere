@@ -65,15 +65,6 @@ const mockProductsWebp = [
     stock: 180,
   },
   {
-    name: "Fitness Tracker Watch",
-    description:
-      "Waterproof activity tracker with heart rate monitor and sleep tracking",
-    price: 59.99,
-    image: null,
-    category: "Fitness",
-    stock: 90,
-  },
-  {
     name: "Portable Bluetooth Speaker",
     description: "Compact waterproof speaker with 12hr playtime",
     price: 45.0,
@@ -98,6 +89,15 @@ const mockProductsJpeg = [
     image: null,
     category: "Kitchen",
     stock: 45,
+  },
+  {
+    name: "Fitness Tracker Watch",
+    description:
+      "Waterproof activity tracker with heart rate monitor and sleep tracking",
+    price: 59.99,
+    image: null,
+    category: "Fitness",
+    stock: 90,
   },
   {
     name: "Wireless Gaming Mouse",
@@ -433,7 +433,7 @@ async function seedDB() {
     console.log("Cleared old orders 🗑️");
 
     for (let product of mockProductsWebp) {
-      product.image = `/${product.name}.webp`;
+      product.image = `${product.name}.webp`;
       product.onSale = Math.random() < 0.3; // 30% chance of being on sale
       product.isFeatured = Math.random() < 0.2; // 20% chance featured
       product.rating = Math.floor(Math.random() * 5) + 1; // 1-5 stars
@@ -451,7 +451,7 @@ async function seedDB() {
     }
 
     for (let product of mockProductsJpeg) {
-      product.image = `/${product.name}.webp`;
+      product.image = `${product.name}.jpeg`;
       product.onSale = Math.random() < 0.3; // 30% chance of being on sale
       product.isFeatured = Math.random() < 0.2; // 20% chance featured
       product.rating = Math.floor(Math.random() * 5) + 1; // 1-5 stars

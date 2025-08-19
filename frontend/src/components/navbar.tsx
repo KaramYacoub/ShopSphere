@@ -54,6 +54,12 @@ export function Navbar() {
             {t("navbar.home")}
           </Link>
           <Link
+            to="/products"
+            className="text-sm font-medium text-muted-foreground hover:text-primary"
+          >
+            {t("navbar.products")}
+          </Link>
+          <Link
             to="/about"
             className="text-sm font-medium text-muted-foreground hover:text-primary"
           >

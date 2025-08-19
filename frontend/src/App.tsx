@@ -5,6 +5,7 @@ import Login from "./pages/Login";
 import VerifyEmail from "./pages/VerifyEmail";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
+import Products from "./pages/Products";
 import Loader from "./components/ui/loader";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -36,6 +37,7 @@ export default function App() {
             />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/products" element={<Products />} />
             <Route path="/" element={<Home />} />
           </Routes>
         </Layout>

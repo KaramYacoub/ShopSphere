@@ -2,8 +2,6 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  ShoppingBag,
-  Star,
   HomeIcon,
   Heart,
   Dumbbell,
@@ -13,9 +11,13 @@ import {
 } from "lucide-react";
 import { useCheckAuth } from "@/hooks/useAuth";
 import { motion } from "framer-motion";
+import { useRandomThreeFeatureProducts } from "@/hooks/useProducts";
+import ProductCard from "@/components/productCard";
+import type { ProductCardProps } from "@/types/product";
 
 export default function Home() {
   const { isAuthenticated } = useCheckAuth();
+  const { data } = useRandomThreeFeatureProducts();
 
   const fadeUp = {
     initial: { opacity: 0, y: 30 },
@@ -74,89 +76,6 @@ export default function Home() {
       count: "250+ Products",
     },
   ];
-
-  // Featured products data
-  const featuredProducts = [
-    {
-      id: 1,
-      name: "Wireless Noise-Cancelling Headphones",
-      price: 199.99,
-      originalPrice: 249.99,
-      image: "/Noise Cancelling Headphones.jpeg",
-      rating: 4.8,
-      reviews: 1247,
-      isNew: true,
-      discount: 20,
-    },
-    {
-      id: 2,
-      name: "Smart Fitness Watch Pro",
-      price: 299.99,
-      originalPrice: 349.99,
-      image: "/Fitness Tracker Watch.avif",
-      rating: 4.9,
-      reviews: 892,
-      isNew: false,
-      discount: 14,
-    },
-    {
-      id: 3,
-      name: "Portable Bluetooth Speaker",
-      price: 89.99,
-      originalPrice: 119.99,
-      image: "/Portable Bluetooth Speaker.webp",
-      rating: 4.7,
-      reviews: 2156,
-      isNew: false,
-      discount: 25,
-    },
-    {
-      id: 4,
-      name: "Smart LED Light Bulb Set",
-      price: 49.99,
-      originalPrice: 79.99,
-      image: "/Smart LED Light Bulb.webp",
-      rating: 4.6,
-      reviews: 743,
-      isNew: true,
-      discount: 38,
-    },
-    {
-      id: 5,
-      name: "Wireless Charging Pad",
-      price: 34.99,
-      originalPrice: 49.99,
-      image: "/Wireless Charging Pad.webp",
-      rating: 4.5,
-      reviews: 1892,
-      isNew: false,
-      discount: 30,
-    },
-    {
-      id: 6,
-      name: "Electric Kettle with Temperature Control",
-      price: 79.99,
-      originalPrice: 99.99,
-      image: "/Electric Kettle.jpeg",
-      rating: 4.8,
-      reviews: 567,
-      isNew: true,
-      discount: 20,
-    },
-  ];
-
-  const renderStars = (rating: number) => {
-    return Array.from({ length: 5 }, (_, i) => (
-      <Star
-        key={i}
-        className={`h-4 w-4 ${
-          i < Math.floor(rating)
-            ? "fill-yellow-400 text-yellow-400"
-            : "text-gray-300"
-        }`}
-      />
-    ));
-  };
 
   return (
     <div className="flex flex-col">
@@ -233,70 +152,25 @@ export default function Home() {
             whileInView="animate"
             viewport={{ once: true }}
           >
-            {featuredProducts.map((product) => (
-              <Card
-                key={product.id}
-                className="group hover:shadow-lg transition-all duration-300 overflow-hidden"
-              >
-                <CardHeader className="p-0">
-                  <div className="relative">
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                    {product.isNew && (
-                      <div className="absolute top-2 left-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-500 text-white">
-                        NEW
-                      </div>
-                    )}
-                    {product.discount > 0 && (
-                      <div className="absolute top-2 right-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-500 text-white">
-                        -{product.discount}%
-                      </div>
-                    )}
-                  </div>
-                </CardHeader>
-                <CardContent className="p-4">
-                  <div className="mb-3">
-                    <h3 className="font-semibold text-lg mb-2 line-clamp-2">
-                      {product.name}
-                    </h3>
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="flex items-center">
-                        {renderStars(product.rating)}
-                      </div>
-                      <span className="text-sm text-muted-foreground">
-                        ({product.reviews})
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xl font-bold text-primary">
-                        ${product.price}
-                      </span>
-                      {product.originalPrice > product.price && (
-                        <span className="text-sm text-muted-foreground line-through">
-                          ${product.originalPrice}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  <Button
-                    className="w-full gap-2"
-                    disabled={!isAuthenticated}
-                    onClick={() => {
-                      if (isAuthenticated) {
-                        console.log(`Added ${product.name} to cart`);
-                      }
-                    }}
-                  >
-                    <ShoppingBag className="h-4 w-4" />
-                    {isAuthenticated ? "Add to Cart" : "Login to Shop"}
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
+            {data?.randomProducts?.map(
+              (product: ProductCardProps, index: number) => (
+                <ProductCard
+                  key={index}
+                  _id={product._id}
+                  image={product.image}
+                  name={product.name}
+                  onSale={product.onSale}
+                  rating={product.rating}
+                  numReviews={product.numReviews}
+                  discountPrice={product.discountPrice}
+                  price={product.price}
+                  stock={product.stock}
+                  category={product.category}
+                  createdAt={product.createdAt}
+                  isAuthenticated={isAuthenticated}
+                />
+              )
+            )}
           </motion.div>
 
           <div className="text-center mt-8">
