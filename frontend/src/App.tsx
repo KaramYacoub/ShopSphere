@@ -9,13 +9,15 @@ import Products from "./pages/Products";
 import Product from "./pages/Product";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
+import OrderConfirmation from "./pages/OrderConfirmation .tsx";
+import ScrollToTop from "./components/ScrollToTop";
 import Loader from "./components/ui/loader";
 import { Toaster } from "@/components/ui/sonner";
 
 import { useCheckAuth } from "./hooks/useAuth";
 import Layout from "./layout/layout";
 import { ThemeProvider } from "./context/theme-provider.tsx";
-import OrderConfirmation from "./pages/OrderConfirmation .tsx";
+import Orders from "./pages/Orders.tsx";
 
 export default function App() {
   const { isAuthenticated, isPending } = useCheckAuth();
@@ -26,6 +28,7 @@ export default function App() {
     <BrowserRouter>
       <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
         <Layout>
+          <ScrollToTop />
           <Routes>
             <Route
               path="/signup"
@@ -54,6 +57,10 @@ export default function App() {
               element={
                 isAuthenticated ? <OrderConfirmation /> : <Navigate to="/" />
               }
+            />
+            <Route
+              path="/orders"
+              element={isAuthenticated ? <Orders /> : <Navigate to="/" />}
             />
           </Routes>
         </Layout>

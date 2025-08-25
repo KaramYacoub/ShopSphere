@@ -8,6 +8,8 @@ import {
   User,
   ChevronDown,
   Menu,
+  Heart,
+  LogOut,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,6 +23,7 @@ import { useTheme } from "../context/theme-provider";
 import { useCheckAuth, useLogout } from "@/hooks/useAuth";
 import { useCart } from "@/hooks/useCart";
 import Loader from "@/components/ui/loader";
+import { Separator } from "@/components/ui/separator";
 
 export function Navbar() {
   const location = useLocation();
@@ -40,14 +43,14 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
-      <div className="flex items-center justify-between h-16 px-4 md:px-8">
+      <div className="relative flex items-center justify-between h-16 px-4 md:px-8">
         {/* Logo */}
         <Link to="/" className="text-xl font-bold text-primary">
           ShopSphere
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-6">
+        <nav className="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 space-x-6">
           <Link
             to="/"
             className="text-sm font-medium text-muted-foreground hover:text-primary"
@@ -150,20 +153,35 @@ export function Navbar() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                  <DropdownMenuItem>
-                    <Link to="/dashboard">Dashboard</Link>
+                  <DropdownMenuItem asChild>
+                    <Link to="/orders">
+                      <ShoppingCart className="mr-2 h-4 w-4" />{" "}
+                      <span>{t("navbar.orders")}</span>
+                    </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Link to="/orders">Orders</Link>
+                  <DropdownMenuItem asChild>
+                    <Link to="/profile">
+                      {" "}
+                      <User className="mr-2 h-4 w-4" />
+                      <span>{t("navbar.profile")}</span>
+                    </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Link to="/profile">Profile</Link>
+                  <DropdownMenuItem asChild>
+                    <Link to="/wishlist">
+                      {" "}
+                      <Heart className="mr-2 h-4 w-4" />
+                      <span>{t("navbar.wishlist")}</span>
+                    </Link>
                   </DropdownMenuItem>
+
+                  <Separator className="mt-2 bg-muted-foreground" />
+
                   <DropdownMenuItem
                     onClick={() => logoutMutation()}
                     className="text-red-600"
                   >
-                    Logout
+                    <LogOut className="mr-2 h-4 w-4" />{" "}
+                    <span>{t("navbar.logout")}</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

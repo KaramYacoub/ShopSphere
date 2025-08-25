@@ -9,10 +9,12 @@ import {
 } from "@/hooks/useProducts";
 import ProductCard from "@/components/productCard";
 import type { Category, ProductCardProps } from "@/types/types";
+import { useTranslation } from "react-i18next";
 
 export default function Home() {
   const { isAuthenticated } = useCheckAuth();
   const { data } = useRandomThreeFeatureProducts();
+  const { t } = useTranslation();
 
   const fadeUp = {
     initial: { opacity: 0, y: 30 },
@@ -43,16 +45,16 @@ export default function Home() {
           transition={{ duration: 0.6 }}
         >
           <h1 className="text-4xl md:text-6xl font-bold">
-            Welcome to ShopSphere
+            {t("Welcome")} ShopSphere
           </h1>
           <p className="mt-4 text-lg md:text-xl text-gray-200">
-            Discover the latest gadgets, electronics, and more.
+            {t("Discover")}
           </p>
           {!isAuthenticated ? (
             <div className="mt-6 flex gap-4 justify-center">
               <Link to="/signup">
                 <Button size="lg" className="text-secondary bg-primary">
-                  Get Started
+                  {t("GetStarted")}
                 </Button>
               </Link>
               <Link to="/login">
@@ -61,7 +63,7 @@ export default function Home() {
                   variant="outline"
                   className="text-primary border-primary hover:bg-primary hover:text-white"
                 >
-                  Login
+                  {t("Login")}
                 </Button>
               </Link>
             </div>
@@ -69,7 +71,7 @@ export default function Home() {
             <div className="mt-6 flex gap-4 justify-center">
               <Link to="/products">
                 <Button size="lg" className="text-secondary bg-primary">
-                  Shop Now
+                  {t("Shop_now")}
                 </Button>
               </Link>
             </div>
@@ -88,7 +90,7 @@ export default function Home() {
               whileInView="animate"
               viewport={{ once: true }}
             >
-              Featured Products
+              {t("FeaturedTitle")}
             </motion.h2>
             <motion.p
               className="text-lg text-muted-foreground max-w-2xl mx-auto"
@@ -97,7 +99,7 @@ export default function Home() {
               whileInView="animate"
               viewport={{ once: true }}
             >
-              Discover our most popular and highly-rated products
+              {t("FeaturedDescription")}
             </motion.p>
           </div>
 
@@ -122,7 +124,7 @@ export default function Home() {
           <div className="text-center mt-8">
             <Link to="/products">
               <Button size="lg" variant="outline">
-                View All Products
+                {t("ShowAll")}
               </Button>
             </Link>
           </div>
@@ -140,7 +142,7 @@ export default function Home() {
               whileInView="animate"
               viewport={{ once: true }}
             >
-              Shop by Category
+              {t("CategoriesTitle")}
             </motion.h2>
             <motion.p
               className="text-lg text-muted-foreground max-w-2xl mx-auto"
@@ -149,8 +151,7 @@ export default function Home() {
               whileInView="animate"
               viewport={{ once: true }}
             >
-              Explore our wide range of products organized by category. Find
-              exactly what you're looking for.
+              {t("CategoriesDescription")}
             </motion.p>
           </div>
 
@@ -179,35 +180,6 @@ export default function Home() {
           </motion.div>
         </div>
       </section>
-
-      {/* Call to Action */}
-      {!isAuthenticated && (
-        <section className="py-20 bg-muted flex flex-col items-center text-center">
-          <motion.h3
-            className="text-2xl font-bold"
-            variants={fadeUp}
-            initial="initial"
-            whileInView="animate"
-            viewport={{ once: true }}
-          >
-            Join ShopSphere Today
-          </motion.h3>
-          <motion.p
-            className="mt-2 text-gray-600 dark:text-gray-400"
-            variants={fadeUp}
-            initial="initial"
-            whileInView="animate"
-            viewport={{ once: true }}
-          >
-            Create an account to unlock shopping, cart, and checkout features.
-          </motion.p>
-          <Link to="/signup">
-            <Button size="lg" className="mt-6">
-              Create Account
-            </Button>
-          </Link>
-        </section>
-      )}
     </div>
   );
 }

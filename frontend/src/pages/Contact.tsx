@@ -126,8 +126,8 @@ export default function Contact() {
             >
               <Card className="text-center hover:shadow-lg transition-shadow">
                 <CardHeader>
-                  <div className="mx-auto w-12 h-12 bg-secondary/10 rounded-full flex items-center justify-center mb-4">
-                    <Phone className="h-6 w-6 text-secondary" />
+                  <div className="mx-auto w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                    <Phone className="h-6 w-6 text-primary" />
                   </div>
                   <CardTitle className="text-lg">
                     {t("contact.info.phone.title")}
@@ -137,9 +137,6 @@ export default function Contact() {
                   <a href="tel:+962796414772" className="text-muted-foreground">
                     +962 796414772
                   </a>
-                  <p className="text-muted-foreground">
-                    {t("contact.info.phone.hours")}
-                  </p>
                 </CardContent>
               </Card>
             </motion.div>
@@ -161,10 +158,8 @@ export default function Contact() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">
-                    {t("contact.info.address.street")}
-                  </p>
-                  <p className="text-muted-foreground">
-                    {t("contact.info.address.city")}
+                    {t("contact.info.address.city")},{" "}
+                    {t("contact.info.address.country")}
                   </p>
                 </CardContent>
               </Card>
@@ -178,8 +173,8 @@ export default function Contact() {
             >
               <Card className="text-center hover:shadow-lg transition-shadow">
                 <CardHeader>
-                  <div className="mx-auto w-12 h-12 bg-secondary/10 rounded-full flex items-center justify-center mb-4">
-                    <Clock className="h-6 w-6 text-secondary" />
+                  <div className="mx-auto w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                    <Clock className="h-6 w-6 text-primary" />
                   </div>
                   <CardTitle className="text-lg">
                     {t("contact.info.hours.title")}
@@ -188,9 +183,6 @@ export default function Contact() {
                 <CardContent>
                   <p className="text-muted-foreground">
                     {t("contact.info.hours.days")}
-                  </p>
-                  <p className="text-muted-foreground">
-                    {t("contact.info.hours.time")}
                   </p>
                 </CardContent>
               </Card>
@@ -242,7 +234,7 @@ export default function Contact() {
                     <div className="grid gap-4 md:grid-cols-2">
                       <div className="space-y-2">
                         <Label htmlFor="name">
-                          {t("contact.form.name.label")} *
+                          {t("contact.form.name.label")}
                         </Label>
                         <Input
                           id="name"
@@ -256,7 +248,7 @@ export default function Contact() {
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="email">
-                          {t("contact.form.email.label")} *
+                          {t("contact.form.email.label")}
                         </Label>
                         <Input
                           id="email"
@@ -272,7 +264,7 @@ export default function Contact() {
 
                     <div className="space-y-2">
                       <Label htmlFor="subject">
-                        {t("contact.form.subject.label")} *
+                        {t("contact.form.subject.label")}
                       </Label>
                       <Input
                         id="subject"
@@ -287,7 +279,7 @@ export default function Contact() {
 
                     <div className="space-y-2">
                       <Label htmlFor="message">
-                        {t("contact.form.message.label")} *
+                        {t("contact.form.message.label")}
                       </Label>
                       <textarea
                         id="message"

@@ -18,10 +18,24 @@ import type { ProductCardProps } from "@/types/types";
 import FiltersSidebar from "@/components/FiltersSidebar";
 import ProductPagination from "@/components/Pagination";
 
+import { motion } from "framer-motion";
+
 export default function Products() {
   const { t } = useTranslation();
   const { isAuthenticated } = useCheckAuth();
   const [searchParams, setSearchParams] = useSearchParams();
+
+  const fadeUp = {
+    initial: { opacity: 0, y: 12 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.5 },
+  };
+
+  const ltr = {
+    initial: { opacity: 0, x: -150 },
+    animate: { opacity: 1, x: 0 },
+    transition: { duration: 0.5 },
+  };
 
   // State for active filters
   const [searchTerm, setSearchTerm] = useState(
@@ -142,21 +156,30 @@ export default function Products() {
   return (
     <div className="min-h-screen bg-muted/30">
       {/* Header */}
-      <div className="border-b">
-        <div className="max-w-7xl mx-auto px-4 py-8">
-          <h1 className="text-3xl md:text-4xl font-bold mb-2">
-            {t("products.title")}
-          </h1>
-          <p className="text-muted-foreground">
-            {t("products.subtitle", { count: pagination.totalProducts || 0 })}
-          </p>
-        </div>
-      </div>
+      <motion.div
+        className="max-w-7xl mx-auto px-4 py-8 border-b"
+        initial={{ opacity: 0, y: -50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        <h1 className="text-3xl md:text-4xl font-bold mb-2">
+          {t("products.title")}
+        </h1>
+        <p className="text-muted-foreground">
+          {t("products.subtitle", { count: pagination.totalProducts || 0 })}
+        </p>
+      </motion.div>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Filters Sidebar */}
-          <div className="lg:w-80">
+          <motion.div
+            className="lg:w-80"
+            variants={ltr}
+            initial="initial"
+            animate="animate"
+            viewport={{ once: true }}
+          >
             <FiltersSidebar
               initialSearchTerm={searchTerm}
               initialSelectedCategory={selectedCategory}
@@ -165,12 +188,18 @@ export default function Products() {
               onClearFilters={handleClearFilters}
               categories={categories}
             />
-          </div>
+          </motion.div>
 
           {/* Products Section */}
           <div className="flex-1">
             {/* Toolbar */}
-            <div className="flex flex-col sm:flex-row justify-end items-center sm:items-center gap-4 mb-6">
+            <motion.div
+              className="flex flex-col sm:flex-row justify-end items-center sm:items-center gap-4 mb-6"
+              variants={fadeUp}
+              initial="initial"
+              animate="animate"
+              viewport={{ once: true }}
+            >
               <div className="flex items-center gap-2">
                 {/* Sort Dropdown */}
                 <DropdownMenu>
@@ -216,23 +245,39 @@ export default function Products() {
                     : t("products.toolbar.sort.desc")}
                 </Button>
               </div>
-            </div>
+            </motion.div>
 
             {/* Products */}
             {products.length > 0 ? (
               <>
+                {" "}
                 {/* Products Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                  {products.map((product: ProductCardProps["product"]) => (
-                    <ProductCard
-                      key={product._id}
-                      product={product}
-                      isAuthenticated={isAuthenticated}
-                    />
-                  ))}
-                </div>
-
-                {/* Pagination - Moved outside the grid */}
+                <motion.div
+                  className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"
+                  variants={fadeUp}
+                  initial="initial"
+                  animate="animate"
+                  viewport={{ once: true }}
+                >
+                  {products.map(
+                    (product: ProductCardProps["product"], index: number) => (
+                      <motion.div
+                        key={product._id}
+                        variants={fadeUp}
+                        initial="initial"
+                        animate="animate"
+                        transition={{ delay: index * 0.1 }}
+                      >
+                        <ProductCard
+                          key={product._id}
+                          product={product}
+                          isAuthenticated={isAuthenticated}
+                        />
+                      </motion.div>
+                    )
+                  )}
+                </motion.div>
+                {/* Pagination */}
                 <div className="mt-8">
                   <ProductPagination
                     currentPage={currentPage}

@@ -60,7 +60,6 @@ const shippingAddressSchema = new Schema({
   country: {
     type: String,
     required: true,
-    default: "United States",
   },
 });
 

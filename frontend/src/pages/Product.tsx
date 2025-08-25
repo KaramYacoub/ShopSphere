@@ -1,5 +1,4 @@
 import { useParams } from "react-router-dom";
-// import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { ShoppingBag, Heart, Plus } from "lucide-react";
 import { useCheckAuth } from "@/hooks/useAuth";
@@ -14,11 +13,13 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import Loader from "@/components/ui/loader";
 import { toast } from "sonner";
+import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 export default function Product() {
+  const { t, i18n } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const { data, isLoading, error } = useProductById(id || "");
-  console.log("data:", data);
   const product = data?.product || {};
   const {
     _id,
@@ -34,7 +35,7 @@ export default function Product() {
     categoryName,
   } = product;
 
-  //   const { t } = useTranslation();
+  const dir = i18n.dir();
   const { isAuthenticated } = useCheckAuth();
   const { mutate: addToCart, isPending: isAdding } = useAddToCart();
   const { mutate: removeFromCart, isPending: isRemoving } = useRemoveFromCart();
@@ -42,17 +43,36 @@ export default function Product() {
 
   const { isInCart } = useCartStatus(_id);
 
+  // Animation variants
+  const fadeUp = {
+    initial: { opacity: 0, y: 12 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.5 },
+  };
+
+  const rtl = {
+    initial: { opacity: 0, x: 150 },
+    animate: { opacity: 1, x: 0 },
+    transition: { duration: 0.5 },
+  };
+
+  const ltr = {
+    initial: { opacity: 0, x: -150 },
+    animate: { opacity: 1, x: 0 },
+    transition: { duration: 0.5 },
+  };
+
   const handleToggleCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
     if (!isAuthenticated) {
-      toast.error("Please login to add to cart");
+      toast.error(t("product.loginToAddCart"));
       return;
     }
 
     if (stock === 0) {
-      toast.error("Product is out of stock");
+      toast.error(t("product.outOfStock"));
       return;
     }
 
@@ -65,12 +85,14 @@ export default function Product() {
   const handleWishlist = (product: { name: string }) => {
     console.log(product);
     if (!isAuthenticated) {
-      toast.error("Please login to add to wishlist");
+      toast.error(t("product.loginToAddWishlist"));
       return;
     }
     setIsWishlisted((prev) => !prev);
     toast.success(
-      `${product.name} ${isWishlisted ? "removed to" : "added to"} wishlist`
+      isWishlisted
+        ? t("product.removedFromWishlist", { name: product.name })
+        : t("product.addedToWishlist", { name: product.name })
     );
   };
 
@@ -80,10 +102,12 @@ export default function Product() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <p className="text-muted-foreground text-lg">Product not found</p>
+          <p className="text-muted-foreground text-lg">
+            {t("product.notFound")}
+          </p>
           <Link to="/products">
             <Button variant="outline" className="mt-4">
-              Back to Products
+              {t("product.backToProducts")}
             </Button>
           </Link>
         </div>
@@ -96,11 +120,22 @@ export default function Product() {
     : 0;
 
   return (
-    <div className="min-h-screen bg-muted/30 py-8">
+    <div className="min-h-screen bg-muted/30 py-8" dir={dir}>
       <div className="max-w-7xl mx-auto px-4">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <motion.div
+          className="grid grid-cols-1 lg:grid-cols-2 gap-8"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6 }}
+        >
           {/* Product Image */}
-          <div className="space-y-4">
+          <motion.div
+            className="space-y-4"
+            variants={ltr}
+            initial="initial"
+            animate="animate"
+            viewport={{ once: true }}
+          >
             <div className="aspect-square overflow-hidden rounded-lg bg-white">
               <img
                 src={`/${image}`}
@@ -108,10 +143,16 @@ export default function Product() {
                 className="w-full h-full object-cover"
               />
             </div>
-          </div>
+          </motion.div>
 
           {/* Product Info */}
-          <div className="space-y-6">
+          <motion.div
+            className="space-y-6"
+            variants={rtl}
+            initial="initial"
+            animate="animate"
+            viewport={{ once: true }}
+          >
             <div>
               <p className="text-sm text-muted-foreground uppercase tracking-wide">
                 {categoryName}
@@ -124,7 +165,7 @@ export default function Product() {
                   {renderStars(rating)}
                 </div>
                 <span className="text-sm text-muted-foreground">
-                  ({numReviews} reviews)
+                  ({numReviews} {t("product.reviews")})
                 </span>
               </div>
             </div>
@@ -156,25 +197,33 @@ export default function Product() {
                 }`}
               />
               <span className={stock > 0 ? "text-green-600" : "text-red-600"}>
-                {stock > 0 ? "In Stock" : "Out of Stock"}
+                {stock > 0 ? t("product.inStock") : t("product.outOfStock")}
               </span>
               {stock > 0 && (
                 <span className="text-sm text-muted-foreground">
-                  ({stock} available)
+                  ({stock} {t("product.available")})
                 </span>
               )}
             </div>
 
             {/* Description */}
             <div>
-              <h3 className="text-lg font-semibold mb-2">Description</h3>
+              <h3 className="text-lg font-semibold mb-2">
+                {t("product.description")}
+              </h3>
               <p className="text-muted-foreground leading-relaxed">
                 {description}
               </p>
             </div>
 
             {/* Actions */}
-            <div className="flex flex-col sm:flex-row gap-4 pt-6">
+            <motion.div
+              className="flex flex-col sm:flex-row gap-4 pt-6"
+              variants={fadeUp}
+              initial="initial"
+              animate="animate"
+              viewport={{ once: true }}
+            >
               <Button
                 size="lg"
                 className="flex-1 gap-2"
@@ -189,16 +238,16 @@ export default function Product() {
                   <Plus className="h-4 w-4" />
                 )}
                 {isRemoving
-                  ? "Removing..."
+                  ? t("product.removing")
                   : isAdding
-                  ? "Adding..."
+                  ? t("product.adding")
                   : isAuthenticated
                   ? stock > 0 && !isInCart
-                    ? "Add to Cart"
+                    ? t("product.addToCart")
                     : stock > 0 && isInCart
-                    ? "Remove from Cart"
-                    : "Out of Stock"
-                  : "Login to Shop"}
+                    ? t("product.removeFromCart")
+                    : t("product.outOfStock")
+                  : t("product.loginToShop")}
               </Button>
 
               <Button
@@ -212,33 +261,45 @@ export default function Product() {
                     isWishlisted ? "fill-red-500 text-red-500" : ""
                   }`}
                 />
-                {isWishlisted ? "Wishlisted" : "Add to Wishlist"}
+                {isWishlisted
+                  ? t("product.wishlisted")
+                  : t("product.addToWishlist")}
               </Button>
-            </div>
+            </motion.div>
 
             {/* Additional Info */}
-            <div className="pt-6 border-t">
+            <motion.div
+              className="pt-6 border-t"
+              variants={fadeUp}
+              initial="initial"
+              animate="animate"
+              viewport={{ once: true }}
+            >
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <span className="font-semibold">Category:</span>
+                  <span className="font-semibold">
+                    {t("product.category")}:
+                  </span>
                   <p className="text-muted-foreground">{categoryName}</p>
                 </div>
                 <div>
-                  <span className="font-semibold">SKU:</span>
+                  <span className="font-semibold">{t("product.sku")}:</span>
                   <p className="text-muted-foreground">
                     #{product._id?.slice(-8).toUpperCase()}
                   </p>
                 </div>
                 {onSale && (
                   <div>
-                    <span className="font-semibold">Sale:</span>
-                    <p className="text-muted-foreground">Active</p>
+                    <span className="font-semibold">{t("product.sale")}:</span>
+                    <p className="text-muted-foreground">
+                      {t("product.active")}
+                    </p>
                   </div>
                 )}
               </div>
-            </div>
-          </div>
-        </div>
+            </motion.div>
+          </motion.div>
+        </motion.div>
       </div>
     </div>
   );
