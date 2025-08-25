@@ -4,12 +4,14 @@ const router = express.Router();
 
 import {
   getRandomThreeFeatureProducts,
-  getAllProductsPublic,
+  getProductById,
+  getAllProducts,
   getAllCategories,
 } from "../controllers/shared.controller.js";
 
 router.get("/featured/random", getRandomThreeFeatureProducts);
-router.get("/products", getAllProductsPublic);
+router.get("/product/:id", getProductById);
+router.get("/products", getAllProducts);
 router.get("/categories", getAllCategories);
 
 export default router;

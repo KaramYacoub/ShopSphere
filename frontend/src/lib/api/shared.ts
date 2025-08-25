@@ -5,7 +5,12 @@ export const getRandomThreeFeatureProducts = async () => {
   return res.data;
 };
 
-export const getAllProductsPublic = async (params = {}) => {
+export const getProductById = async (id: string) => {
+  const res = await axiosInstance.get(`shared/product/${id}`);
+  return res.data;
+};
+
+export const getAllProducts = async (params = {}) => {
   const res = await axiosInstance.get("shared/products", { params });
   return res.data;
 };

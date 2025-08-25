@@ -1,4 +1,5 @@
 import Product from "../models/product.js";
+import Category from "../models/category.js";
 
 export const getRandomThreeFeatureProducts = async (req, res) => {
   try {
@@ -18,33 +19,41 @@ export const getRandomThreeFeatureProducts = async (req, res) => {
   }
 };
 
-export const getAllProductsPublic = async (req, res) => {
+export const getProductById = async (req, res) => {
   try {
-    const { 
-      page = 1, 
-      limit = 9, 
-      category, 
-      search, 
-      minPrice, 
-      maxPrice, 
-      sortBy = 'createdAt', 
-      sortOrder = 'desc' 
+    const id = req.params.id;
+    const product = await Product.findById(id);
+    res.json({ success: true, product });
+  } catch (error) {
+    console.error("Error in getProductById controller:", error.message);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const getAllProducts = async (req, res) => {
+  try {
+    const {
+      page = 1,
+      limit = 9,
+      category,
+      search,
+      minPrice,
+      maxPrice,
+      sortBy = "name",
+      sortOrder = "desc",
     } = req.query;
 
     // Build filter object
     const filter = {};
-    
-    if (category && category !== '') {
-      filter.category = category;
+
+    if (category && category !== "") {
+      filter.categoryName = category;
     }
-    
+
     if (search) {
-      filter.$or = [
-        { name: { $regex: search, $options: 'i' } },
-        { description: { $regex: search, $options: 'i' } }
-      ];
+      filter.name = { $regex: search, $options: "i" };
     }
-    
+
     if (minPrice || maxPrice) {
       filter.price = {};
       if (minPrice) filter.price.$gte = Number(minPrice);
@@ -53,7 +62,7 @@ export const getAllProductsPublic = async (req, res) => {
 
     // Build sort object
     const sort = {};
-    sort[sortBy] = sortOrder === 'asc' ? 1 : -1;
+    sort[sortBy] = sortOrder === "asc" ? 1 : -1;
 
     // Calculate pagination
     const pageNum = parseInt(page);
@@ -61,21 +70,30 @@ export const getAllProductsPublic = async (req, res) => {
     const skip = (pageNum - 1) * limitNum;
 
     // Execute queries
-    const [products, totalProducts] = await Promise.all([
-      Product.find(filter)
-        .sort(sort)
-        .skip(skip)
-        .limit(limitNum),
-      Product.countDocuments(filter)
-    ]);
+    const products = await Product.find(filter)
+      .sort(sort)
+      .skip(skip)
+      .limit(limitNum);
+    const totalProducts = await Product.countDocuments(filter);
+
+    if (totalProducts === 0) {
+      return res.status(404).json({ message: "No products found" });
+    }
+
+    for (const product of products) {
+      const productCategory = await Category.findById(product.category);
+      if (productCategory) {
+        product.categoryName = productCategory.name;
+      }
+    }
 
     // Calculate pagination info
     const totalPages = Math.ceil(totalProducts / limitNum);
     const hasNextPage = pageNum < totalPages;
     const hasPrevPage = pageNum > 1;
 
-    res.json({ 
-      success: true, 
+    res.json({
+      success: true,
       products,
       pagination: {
         currentPage: pageNum,
@@ -83,8 +101,8 @@ export const getAllProductsPublic = async (req, res) => {
         totalProducts,
         hasNextPage,
         hasPrevPage,
-        limit: limitNum
-      }
+        limit: limitNum,
+      },
     });
   } catch (error) {
     console.error("Error in getAllProductsPublic controller:", error.message);
@@ -94,7 +112,8 @@ export const getAllProductsPublic = async (req, res) => {
 
 export const getAllCategories = async (req, res) => {
   try {
-    const categories = await Product.find().distinct("category");
+    const categoriesIds = await Product.find().distinct("category");
+    const categories = await Category.find({ _id: { $in: categoriesIds } });
     res.json({ success: true, categories });
   } catch (error) {
     console.error("Error in getAllCategories controller:", error.message);

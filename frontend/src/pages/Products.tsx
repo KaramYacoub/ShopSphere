@@ -11,12 +11,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
 
-import { useAllProductsPublic, useAllCategories } from "@/hooks/useProducts";
+import { useAllProducts, useAllCategories } from "@/hooks/useProducts";
 import { useCheckAuth } from "@/hooks/useAuth";
 import ProductCard from "@/components/productCard";
-import type { ProductCardProps } from "@/types/product";
+import type { ProductCardProps } from "@/types/types";
 import FiltersSidebar from "@/components/FiltersSidebar";
-import PaginationComponent from "@/components/Pagination";
+import ProductPagination from "@/components/Pagination";
 
 export default function Products() {
   const { t } = useTranslation();
@@ -40,7 +40,7 @@ export default function Products() {
   });
   const [sortBy, setSortBy] = useState(searchParams.get("sortBy") || "name");
   const [sortOrder, setSortOrder] = useState(
-    searchParams.get("sortOrder") || "desc"
+    searchParams.get("sortOrder") || "asc"
   );
   const [currentPage, setCurrentPage] = useState(
     Number(searchParams.get("page")) || 1
@@ -60,7 +60,7 @@ export default function Products() {
 
   // Fetch data
   const { data: productsData, isLoading: productsLoading } =
-    useAllProductsPublic(queryParams);
+    useAllProducts(queryParams);
   const { data: categoriesData, isLoading: categoriesLoading } =
     useAllCategories();
 
@@ -142,7 +142,7 @@ export default function Products() {
   return (
     <div className="min-h-screen bg-muted/30">
       {/* Header */}
-      <div className="bg-primary-foreground border-b">
+      <div className="border-b">
         <div className="max-w-7xl mx-auto px-4 py-8">
           <h1 className="text-3xl md:text-4xl font-bold mb-2">
             {t("products.title")}
@@ -219,7 +219,29 @@ export default function Products() {
             </div>
 
             {/* Products */}
-            {products.length === 0 ? (
+            {products.length > 0 ? (
+              <>
+                {/* Products Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                  {products.map((product: ProductCardProps["product"]) => (
+                    <ProductCard
+                      key={product._id}
+                      product={product}
+                      isAuthenticated={isAuthenticated}
+                    />
+                  ))}
+                </div>
+
+                {/* Pagination - Moved outside the grid */}
+                <div className="mt-8">
+                  <ProductPagination
+                    currentPage={currentPage}
+                    totalPages={pagination.totalPages || 1}
+                    onPageChange={handlePageChange}
+                  />
+                </div>
+              </>
+            ) : (
               <Card className="text-center py-12">
                 <CardContent>
                   <p className="text-muted-foreground text-lg">
@@ -234,35 +256,6 @@ export default function Products() {
                   </Button>
                 </CardContent>
               </Card>
-            ) : (
-              <>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {products.map((product: ProductCardProps) => (
-                    <ProductCard
-                      key={product._id}
-                      _id={product._id}
-                      image={product.image}
-                      name={product.name}
-                      onSale={product.onSale}
-                      rating={product.rating}
-                      numReviews={product.numReviews}
-                      discountPrice={product.discountPrice}
-                      price={product.price}
-                      stock={product.stock}
-                      category={product.category}
-                      createdAt={product.createdAt}
-                      isAuthenticated={isAuthenticated}
-                    />
-                  ))}
-                </div>
-
-                {/* Pagination */}
-                <PaginationComponent
-                  currentPage={currentPage}
-                  totalPages={pagination.totalPages || 1}
-                  onPageChange={handlePageChange}
-                />
-              </>
             )}
           </div>
         </div>

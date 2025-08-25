@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import "dotenv/config";
 import Product from "../models/product.js";
 import Order from "../models/order.js";
+import Category from "../models/category.js";
 
 const mockProductsWebp = [
   {
@@ -417,6 +418,78 @@ const mockProductsJpeg = [
     stock: 80,
   },
 ];
+const mockCategories = [
+  {
+    name: "Electronics",
+    description: "Electronic devices and accessories",
+    displayOrder: 1,
+  },
+  {
+    name: "Home",
+    description: "Home and living products",
+    displayOrder: 2,
+  },
+  {
+    name: "Fitness",
+    description: "Fitness equipment and accessories",
+    displayOrder: 3,
+  },
+  {
+    name: "Clothing",
+    description: "Clothing and apparel",
+    displayOrder: 4,
+  },
+  {
+    name: "Accessories",
+    description: "Fashion accessories",
+    displayOrder: 5,
+  },
+  {
+    name: "Kitchen",
+    description: "Kitchen appliances and tools",
+    displayOrder: 6,
+  },
+  {
+    name: "Health",
+    description: "Health and wellness products",
+    displayOrder: 7,
+  },
+  {
+    name: "Beauty",
+    description: "Beauty and personal care products",
+    displayOrder: 8,
+  },
+  {
+    name: "Office",
+    description: "Office supplies and equipment",
+    displayOrder: 9,
+  },
+  {
+    name: "Garden",
+    description: "Gardening tools and supplies",
+    displayOrder: 10,
+  },
+  {
+    name: "Games",
+    description: "Games and puzzles",
+    displayOrder: 11,
+  },
+  {
+    name: "Outdoor",
+    description: "Outdoor and camping gear",
+    displayOrder: 12,
+  },
+  {
+    name: "Automotive",
+    description: "Automotive accessories",
+    displayOrder: 13,
+  },
+  {
+    name: "Arts",
+    description: "Arts and crafts supplies",
+    displayOrder: 14,
+  },
+];
 
 async function seedDB() {
   try {
@@ -424,20 +497,39 @@ async function seedDB() {
 
     console.log("Connected to MongoDB ✅");
 
-    // Clear existing products (optional)
+    // Clear existing data
     await Product.deleteMany({});
     console.log("Cleared old products 🗑️");
 
-    // Clear existing orders (optional)
     await Order.deleteMany({});
     console.log("Cleared old orders 🗑️");
 
+    await Category.deleteMany({});
+    console.log("Cleared old categories 🗑️");
+
+    // Insert categories
+    const categories = await Category.insertMany(mockCategories);
+    console.log("Inserted categories 🎉");
+
+    // Create a mapping of category names to their IDs
+    const categoryMap = {};
+    categories.forEach((category) => {
+      categoryMap[category.name] = {
+        id: category._id,
+        name: category.name,
+      };
+    });
+
     for (let product of mockProductsWebp) {
+      const categoryInfo = categoryMap[product.category];
+
       product.image = `${product.name}.webp`;
       product.onSale = Math.random() < 0.3; // 30% chance of being on sale
       product.isFeatured = Math.random() < 0.2; // 20% chance featured
       product.rating = Math.floor(Math.random() * 5) + 1; // 1-5 stars
       product.numReviews = Math.floor(Math.random() * 500) + 1; // 0-500 reviews
+      product.category = categoryInfo.id; // Set to ObjectId
+      product.categoryName = categoryInfo.name; // Set to category name string
 
       if (product.onSale) {
         // random 10-40% discount
@@ -451,11 +543,16 @@ async function seedDB() {
     }
 
     for (let product of mockProductsJpeg) {
+      const categoryInfo = categoryMap[product.category];
+
       product.image = `${product.name}.jpeg`;
       product.onSale = Math.random() < 0.3; // 30% chance of being on sale
       product.isFeatured = Math.random() < 0.2; // 20% chance featured
       product.rating = Math.floor(Math.random() * 5) + 1; // 1-5 stars
       product.numReviews = Math.floor(Math.random() * 500) + 1; // 0-500 reviews
+      product.category = categoryMap[product.category]; // map category name to ID
+      product.category = categoryInfo.id; // Set to ObjectId
+      product.categoryName = categoryInfo.name; // Set to category name string
 
       if (product.onSale) {
         // random 10-40% discount

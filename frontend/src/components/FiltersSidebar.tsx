@@ -12,19 +12,7 @@ import {
 import { Search, Filter, SlidersHorizontal, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
-
-type FiltersSidebarProps = {
-  initialSearchTerm?: string;
-  initialSelectedCategory?: string;
-  initialPriceRange?: { min: number | string; max: number | string };
-  onFiltersChange: (filters: {
-    searchTerm: string;
-    selectedCategory: string;
-    priceRange: { min: number | string; max: number | string };
-  }) => void;
-  onClearFilters: () => void;
-  categories: string[];
-};
+import type { FiltersSidebarProps } from "@/types/types";
 
 export default function FiltersSidebar({
   initialSearchTerm = "",
@@ -133,8 +121,8 @@ export default function FiltersSidebar({
                 {t("products.filters.allCategories")}
               </SelectItem>
               {categories.map((category) => (
-                <SelectItem key={category} value={category}>
-                  {category}
+                <SelectItem key={category._id} value={category.name}>
+                  {category.name}
                 </SelectItem>
               ))}
             </SelectContent>

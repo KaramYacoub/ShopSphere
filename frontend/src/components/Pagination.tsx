@@ -8,17 +8,17 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 
-interface PaginationComponentProps {
+interface ProductPaginationProps {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
 }
 
-export default function PaginationComponent({
+export default function ProductPagination({
   currentPage,
   totalPages,
   onPageChange,
-}: PaginationComponentProps) {
+}: ProductPaginationProps) {
   if (totalPages <= 1) return null;
 
   const handlePageChange = (page: number) => {
@@ -27,8 +27,8 @@ export default function PaginationComponent({
   };
 
   return (
-    <div className="mt-8 flex justify-center">
-      <Pagination>
+    <div className="mt-8 flex justify-center w-full">
+      <Pagination className="mx-auto">
         <PaginationContent>
           <PaginationItem>
             <PaginationPrevious

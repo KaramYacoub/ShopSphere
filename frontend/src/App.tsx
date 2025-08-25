@@ -6,12 +6,16 @@ import VerifyEmail from "./pages/VerifyEmail";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Products from "./pages/Products";
+import Product from "./pages/Product";
+import Cart from "./pages/Cart";
+import Checkout from "./pages/Checkout";
 import Loader from "./components/ui/loader";
 import { Toaster } from "@/components/ui/sonner";
 
 import { useCheckAuth } from "./hooks/useAuth";
 import Layout from "./layout/layout";
 import { ThemeProvider } from "./context/theme-provider.tsx";
+import OrderConfirmation from "./pages/OrderConfirmation .tsx";
 
 export default function App() {
   const { isAuthenticated, isPending } = useCheckAuth();
@@ -38,7 +42,19 @@ export default function App() {
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/products" element={<Products />} />
+            <Route path="/product/:id" element={<Product />} />
             <Route path="/" element={<Home />} />
+            <Route path="/cart" element={<Cart />} />
+            <Route
+              path="/checkout"
+              element={isAuthenticated ? <Checkout /> : <Navigate to="/" />}
+            />
+            <Route
+              path="/order-confirmation"
+              element={
+                isAuthenticated ? <OrderConfirmation /> : <Navigate to="/" />
+              }
+            />
           </Routes>
         </Layout>
         <Toaster richColors closeButton toastOptions={{ duration: 3000 }} />

@@ -11,10 +11,9 @@ import "./config/passport.js";
 import connectDB from "./config/db.js";
 
 import authRouter from "./routers/auth.route.js";
-import ProductRouter from "./routers/product.route.js";
 import sharedRouter from "./routers/shared.route.js";
-
-import { protectRoute, protectUser } from "./middlewares/auth.middleware.js";
+import cartRouter from "./routers/cart.route.js";
+import orderRoutes from "./routers/order.routes.js";
 
 const PORT = process.env.PORT;
 
@@ -36,7 +35,8 @@ app.use(passport.initialize());
 
 app.use("/api/shared", sharedRouter);
 app.use("/api/auth", authRouter);
-app.use("/api/product", protectRoute, protectUser, ProductRouter);
+app.use("/api/cart", cartRouter);
+app.use("/api/orders", orderRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

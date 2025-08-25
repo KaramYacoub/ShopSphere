@@ -1,26 +1,39 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { ShoppingBag, Heart } from "lucide-react";
+import { ShoppingBag, Heart, Plus } from "lucide-react";
 import { Button } from "./ui/button";
-import type { ProductCardProps } from "@/types/product";
+import type { ProductCardProps } from "@/types/types";
 import { renderStars, renderPrice } from "@/utils/utils";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import {
+  useAddToCart,
+  useCartStatus,
+  useRemoveFromCart,
+} from "@/hooks/useCart";
 
-function ProductCard({
-  _id,
-  image,
-  name,
-  onSale,
-  rating,
-  numReviews,
-  discountPrice,
-  price,
-  stock,
-  category,
-  createdAt,
-  isAuthenticated,
-}: ProductCardProps) {
+function ProductCard({ product, isAuthenticated }: ProductCardProps) {
+  const {
+    _id,
+    image,
+    name,
+    onSale,
+    rating,
+    numReviews,
+    discountPrice,
+    price,
+    stock,
+    categoryName,
+    createdAt,
+  } = product;
+
   const [isHovered, setIsHovered] = useState(false);
   const [isWishlisted, setIsWishlisted] = useState(false);
+  const { mutate: addToCart, isPending: isAdding } = useAddToCart();
+  const { mutate: removeFromCart, isPending: isRemoving } = useRemoveFromCart();
+  const navigate = useNavigate();
+
+  const { isInCart } = useCartStatus(_id);
 
   const isNew =
     new Date().getTime() - new Date(createdAt).getTime() <
@@ -30,12 +43,53 @@ function ProductCard({
     ? Math.round(((price - discountPrice) / price) * 100)
     : 0;
 
+  const handleToggleCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!isAuthenticated) {
+      toast.error("Please login to add to cart");
+      return;
+    }
+
+    if (stock === 0) {
+      toast.error("Product is out of stock");
+      return;
+    }
+
+    if (isInCart) {
+      removeFromCart(_id);
+    } else {
+      addToCart({ productId: _id, quantity: 1 });
+    }
+  };
+
+  const handleWishlist = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!isAuthenticated) {
+      toast.error("Please login to add to wishlist");
+      return;
+    }
+
+    setIsWishlisted(!isWishlisted);
+    toast.success(
+      `${name} ${isWishlisted ? "removed from" : "added to"} wishlist`
+    );
+  };
+
+  const handleClick = () => {
+    navigate(`/product/${_id}`);
+  };
+
   return (
     <Card
       key={_id}
-      className="group hover:shadow-xl transition-all duration-300 overflow-hidden border-0 relative p-0"
+      className="group hover:shadow-xl transition-all duration-300 overflow-hidden border-0 relative p-0 hover:cursor-pointer"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onClick={handleClick}
       style={{
         minHeight: "400px",
       }}
@@ -83,10 +137,7 @@ function ProductCard({
                   ? "bg-red-50 hover:bg-red-100"
                   : "bg-white/90 hover:bg-white"
               }`}
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsWishlisted(!isWishlisted);
-              }}
+              onClick={handleWishlist}
             >
               <Heart
                 className={`h-4 w-4 ${
@@ -98,7 +149,7 @@ function ProductCard({
 
           {/* Category */}
           <p className="text-xs font-medium text-white/80 uppercase tracking-wide mb-2">
-            {category}
+            {categoryName}
           </p>
 
           {/* Product Name */}
@@ -136,18 +187,26 @@ function ProductCard({
 
             <Button
               className="gap-2 rounded-full px-4 transition-all duration-300 bg-white text-gray-900 hover:bg-gray-100"
-              disabled={!isAuthenticated || stock === 0}
-              onClick={() => {
-                if (isAuthenticated && stock > 0) {
-                  console.log(`Added ${name} to cart`);
-                }
-              }}
+              disabled={
+                !isAuthenticated || stock === 0 || isAdding || isRemoving
+              }
+              onClick={handleToggleCart}
               size="sm"
             >
-              <ShoppingBag className="h-4 w-4" />
-              {isAuthenticated
-                ? stock > 0
+              {isInCart ? (
+                <ShoppingBag className="h-4 w-4" />
+              ) : (
+                <Plus className="h-4 w-4" />
+              )}
+              {isRemoving
+                ? "Removing..."
+                : isAdding
+                ? "Adding..."
+                : isAuthenticated
+                ? stock > 0 && !isInCart
                   ? "Add to Cart"
+                  : stock > 0 && isInCart
+                  ? "Remove from Cart"
                   : "Out of Stock"
                 : "Login to Shop"}
             </Button>
