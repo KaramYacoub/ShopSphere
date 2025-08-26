@@ -11,7 +11,6 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       unique: true,
-      lowercase: true,
     },
     password: {
       type: String, // only required for email/password signup
@@ -27,6 +26,27 @@ const userSchema = new mongoose.Schema(
     isVerified: {
       type: Boolean,
       default: false,
+    },
+    emailChangeToken: {
+      type: String,
+      select: false,
+    }, // to confirm email change
+    emailChangeTokenExpires: {
+      type: Date,
+      select: false,
+    }, // optional
+    pendingEmail: {
+      type: String,
+      select: false,
+    }, // holds new email until verified
+
+    resetOTP: {
+      type: String,
+      select: false,
+    },
+    resetOTPExpires: {
+      type: Date,
+      select: false,
     },
   },
   { timestamps: true }

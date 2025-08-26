@@ -18,6 +18,8 @@ import { useCheckAuth } from "./hooks/useAuth";
 import Layout from "./layout/layout";
 import { ThemeProvider } from "./context/theme-provider.tsx";
 import Orders from "./pages/Orders.tsx";
+import Profile from "./pages/Profile.tsx";
+import ForgetPassword from "./pages/ForgetPassword.tsx";
 
 export default function App() {
   const { isAuthenticated, isPending } = useCheckAuth();
@@ -39,8 +41,18 @@ export default function App() {
               element={!isAuthenticated ? <Login /> : <Navigate to="/" />}
             />
             <Route
+              path="/forgot-password"
+              element={
+                !isAuthenticated ? <ForgetPassword /> : <Navigate to="/" />
+              }
+            />
+            <Route
               path="/verify-email"
               element={!isAuthenticated ? <VerifyEmail /> : <Navigate to="/" />}
+            />
+            <Route
+              path="/profile"
+              element={isAuthenticated ? <Profile /> : <Navigate to="/login" />}
             />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
@@ -50,17 +62,23 @@ export default function App() {
             <Route path="/cart" element={<Cart />} />
             <Route
               path="/checkout"
-              element={isAuthenticated ? <Checkout /> : <Navigate to="/" />}
+              element={
+                isAuthenticated ? <Checkout /> : <Navigate to="/login" />
+              }
             />
             <Route
               path="/order-confirmation"
               element={
-                isAuthenticated ? <OrderConfirmation /> : <Navigate to="/" />
+                isAuthenticated ? (
+                  <OrderConfirmation />
+                ) : (
+                  <Navigate to="/login" />
+                )
               }
             />
             <Route
               path="/orders"
-              element={isAuthenticated ? <Orders /> : <Navigate to="/" />}
+              element={isAuthenticated ? <Orders /> : <Navigate to="/login" />}
             />
           </Routes>
         </Layout>

@@ -1,9 +1,12 @@
 import { toast } from "sonner";
 import {
   checkAuth,
+  forgotPassword,
   login,
   logout,
+  resetPassword,
   signup,
+  updateProfile,
   verifyEmail,
 } from "@/lib/api/authApi";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -133,4 +136,101 @@ export function useCheckAuth() {
     user: data?.user,
     isPending,
   };
+}
+
+export function useUpdateProfile() {
+  const queryClient = useQueryClient();
+  const { mutate: updateProfileMutation, isPending } = useMutation({
+    mutationKey: ["update-profile"],
+    mutationFn: updateProfile,
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["check-auth"] });
+      if (data.message && data.message.includes("email change")) {
+        toast.success("Verification email sent to your new email address");
+      } else {
+        toast.success("Profile updated successfully!");
+      }
+    },
+    onError: (err: unknown) => {
+      if (
+        err &&
+        typeof err === "object" &&
+        "response" in err &&
+        err.response &&
+        typeof err.response === "object" &&
+        "data" in err.response &&
+        err.response.data &&
+        typeof err.response.data === "object" &&
+        "message" in err.response.data
+      ) {
+        toast.error(String(err?.response?.data?.message) || "Update failed");
+      } else {
+        toast.error("Update failed");
+      }
+    },
+  });
+  return { updateProfileMutation, isPending };
+}
+
+export function useForgotPassword() {
+  const { mutate: forgotPasswordMutation, isPending } = useMutation({
+    mutationKey: ["forgot-password"],
+    mutationFn: forgotPassword,
+    onSuccess: () => {
+      toast.success("OTP sent to your email");
+    },
+    onError: (err: unknown) => {
+      if (
+        err &&
+        typeof err === "object" &&
+        "response" in err &&
+        err.response &&
+        typeof err.response === "object" &&
+        "data" in err.response &&
+        err.response.data &&
+        typeof err.response.data === "object" &&
+        "message" in err.response.data
+      ) {
+        toast.error(
+          String(err?.response?.data?.message) || "Failed to send OTP"
+        );
+      } else {
+        toast.error("Failed to send OTP");
+      }
+    },
+  });
+  return { forgotPasswordMutation, isPending };
+}
+
+export function useResetPassword() {
+  const { mutate: resetPasswordMutation, isPending } = useMutation({
+    mutationKey: ["reset-password"],
+    mutationFn: resetPassword,
+    onSuccess: () => {
+      toast.success("Password reset successfully");
+      setTimeout(() => {
+        window.location.href = "/login";
+      }, 2000);
+    },
+    onError: (err: unknown) => {
+      if (
+        err &&
+        typeof err === "object" &&
+        "response" in err &&
+        err.response &&
+        typeof err.response === "object" &&
+        "data" in err.response &&
+        err.response.data &&
+        typeof err.response.data === "object" &&
+        "message" in err.response.data
+      ) {
+        toast.error(
+          String(err?.response?.data?.message) || "Failed to reset password"
+        );
+      } else {
+        toast.error("Failed to reset password");
+      }
+    },
+  });
+  return { resetPasswordMutation, isPending };
 }

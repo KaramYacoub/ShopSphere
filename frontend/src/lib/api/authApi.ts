@@ -27,10 +27,38 @@ export const verifyEmail = async (token: string) => {
 
 export const logout = async () => {
   const res = await axiosInstance.post("/auth/logout");
+  window.location.href = "/";
   return res.data;
 };
 
 export const checkAuth = async () => {
   const res = await axiosInstance.get("/auth/me");
+  return res.data;
+};
+
+export const updateProfile = async (data: unknown) => {
+  const res = await axiosInstance.put("/auth/update-profile", data);
+  return res.data;
+};
+
+export const forgotPassword = async (email: string) => {
+  const res = await axiosInstance.post("/auth/forget-password", { email });
+  return res.data;
+};
+
+export const resetPassword = async ({
+  email,
+  otp,
+  newPassword,
+}: {
+  email: string;
+  otp: string;
+  newPassword: string;
+}) => {
+  const res = await axiosInstance.post("/auth/reset-password", {
+    email,
+    otp,
+    newPassword,
+  });
   return res.data;
 };
