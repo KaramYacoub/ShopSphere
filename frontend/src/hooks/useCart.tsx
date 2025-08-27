@@ -7,11 +7,13 @@ import {
   removeFromCart,
   clearCart,
 } from "@/lib/api/cart";
+import { useCheckAuth } from "./useAuth";
 
 export const useCart = () => {
   return useQuery({
     queryKey: ["cart"],
     queryFn: getCart,
+    enabled: useCheckAuth().isAuthenticated,
   });
 };
 

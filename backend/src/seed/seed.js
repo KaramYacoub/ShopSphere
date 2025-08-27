@@ -3,8 +3,10 @@ import "dotenv/config";
 import Product from "../models/product.js";
 import Order from "../models/order.js";
 import Category from "../models/category.js";
+import Wishlist from "../models/wishlist.js";
+import Cart from "../models/cart.js";
 
-const mockProductsWebp = [
+const mockProducts = [
   {
     name: "Wireless Bluetooth Earbuds",
     description:
@@ -73,8 +75,6 @@ const mockProductsWebp = [
     category: "Electronics",
     stock: 60,
   },
-];
-const mockProductsJpeg = [
   {
     name: "Leather Wallet",
     description: "Genuine leather bifold wallet with RFID protection",
@@ -501,6 +501,12 @@ async function seedDB() {
     await Product.deleteMany({});
     console.log("Cleared old products 🗑️");
 
+    await Wishlist.deleteMany({});
+    console.log("Cleared old wishlists 🗑️");
+
+    await Cart.deleteMany();
+    console.log("Cleared old carts 🗑️");
+
     await Order.deleteMany({});
     console.log("Cleared old orders 🗑️");
 
@@ -520,32 +526,10 @@ async function seedDB() {
       };
     });
 
-    for (let product of mockProductsWebp) {
+    for (let product of mockProducts) {
       const categoryInfo = categoryMap[product.category];
 
-      product.image = `${product.name}.webp`;
-      product.onSale = Math.random() < 0.3; // 30% chance of being on sale
-      product.isFeatured = Math.random() < 0.2; // 20% chance featured
-      product.rating = Math.floor(Math.random() * 5) + 1; // 1-5 stars
-      product.numReviews = Math.floor(Math.random() * 500) + 1; // 0-500 reviews
-      product.category = categoryInfo.id; // Set to ObjectId
-      product.categoryName = categoryInfo.name; // Set to category name string
-
-      if (product.onSale) {
-        // random 10-40% discount
-        const discount = product.price * (Math.random() * 0.3 + 0.1);
-        product.discountPrice = parseFloat(
-          (product.price - discount).toFixed(2)
-        );
-      } else {
-        product.discountPrice = null;
-      }
-    }
-
-    for (let product of mockProductsJpeg) {
-      const categoryInfo = categoryMap[product.category];
-
-      product.image = `${product.name}.jpeg`;
+      product.image = `uploads/${product.name}.jpeg`;
       product.onSale = Math.random() < 0.3; // 30% chance of being on sale
       product.isFeatured = Math.random() < 0.2; // 20% chance featured
       product.rating = Math.floor(Math.random() * 5) + 1; // 1-5 stars
@@ -566,8 +550,7 @@ async function seedDB() {
     }
 
     // Insert mock products
-    await Product.insertMany(mockProductsWebp);
-    await Product.insertMany(mockProductsJpeg);
+    await Product.insertMany(mockProducts);
     console.log("Inserted 50 mock products 🎉");
 
     mongoose.disconnect();

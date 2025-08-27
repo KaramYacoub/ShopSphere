@@ -80,6 +80,7 @@
   "contact.form.message.label": "Message",
   "contact.form.message.placeholder": "Tell me more about your inquiry...",
   "contact.form.submit": "Send Message",
+  "contact.form.submitting": "Sending...",
   "contact.form.success.title": "Message Sent Successfully!",
   "contact.form.success.message": "Thank you for reaching out. I'll get back to you within 24 hours.",
   "contact.creator.title": "Direct Contact",
@@ -265,5 +266,42 @@
   "Resetting": "Resetting...",
   "Remember_password": "Remember your password?",
   "Back_to_login": "Back to login",
-  "Back": "Back"
+  "Back": "Back",
+
+  "wishlist": {
+    "title": "My Wishlist",
+    "subtitle": "{{count}} items in your wishlist",
+    "loading": "Loading your wishlist...",
+    "toolbar": {
+      "sortBy": "Sort by {{field}}",
+      "sort": {
+        "name": "Name",
+        "price": "Price",
+        "rating": "Rating",
+        "asc": "A-Z",
+        "desc": "Z-A"
+      }
+    },
+    "empty": {
+      "title": "Your wishlist is empty",
+      "description": "Items you save to your wishlist will appear here",
+      "cta": "Browse Products"
+    }
+  },
+
+  "notFound": {
+    "title": "Page Not Found",
+    "description": "The page you're looking for doesn't exist or has been moved.",
+    "actions": {
+      "home": "Go Home",
+      "browse": "Browse Products",
+      "back": "Go Back"
+    },
+    "help": {
+      "title": "Need Help?",
+      "description": "If you believe this is an error or need assistance, feel free to reach out to us.",
+      "contact": "Contact Support",
+      "about": "About Us"
+    }
+  }
 }

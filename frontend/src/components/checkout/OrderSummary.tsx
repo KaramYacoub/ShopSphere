@@ -24,7 +24,7 @@ export function OrderSummary({ cart, shippingCost }: OrderSummaryProps) {
             <div key={item._id} className="flex justify-between">
               <div className="flex gap-2">
                 <img
-                  src={`/${item.image}`}
+                  src={`${import.meta.env.VITE_BACKEND_URL}/${item.image}`}
                   alt={item.name}
                   className="w-10 h-10 rounded"
                 />

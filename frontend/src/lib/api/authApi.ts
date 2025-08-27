@@ -37,12 +37,12 @@ export const checkAuth = async () => {
 };
 
 export const updateProfile = async (data: unknown) => {
-  const res = await axiosInstance.put("/auth/update-profile", data);
+  const res = await axiosInstance.put("/user/update-profile", data);
   return res.data;
 };
 
 export const forgotPassword = async (email: string) => {
-  const res = await axiosInstance.post("/auth/forget-password", { email });
+  const res = await axiosInstance.post("/user/forget-password", { email });
   return res.data;
 };
 
@@ -55,10 +55,20 @@ export const resetPassword = async ({
   otp: string;
   newPassword: string;
 }) => {
-  const res = await axiosInstance.post("/auth/reset-password", {
+  const res = await axiosInstance.post("/user/reset-password", {
     email,
     otp,
     newPassword,
   });
+  return res.data;
+};
+
+export const contactUs = async (data: {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}) => {
+  const res = await axiosInstance.post("/user/contact-us", data);
   return res.data;
 };

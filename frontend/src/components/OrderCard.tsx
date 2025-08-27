@@ -86,7 +86,7 @@ export default function OrderCard({ order }: { order: Order }) {
             {order.items.map((item, index) => (
               <div key={index} className="flex items-center gap-4">
                 <img
-                  src={`/${item.image}`}
+                  src={`${import.meta.env.VITE_BACKEND_URL}/${item.image}`}
                   alt={item.name}
                   className="w-12 h-12 object-cover rounded"
                 />

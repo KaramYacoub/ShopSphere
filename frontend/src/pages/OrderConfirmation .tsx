@@ -211,7 +211,9 @@ function OrderConfirmation() {
                       transition={{ delay: index * 0.1 }}
                     >
                       <img
-                        src={`/${item.image}`}
+                        src={`${import.meta.env.VITE_BACKEND_URL}/${
+                          item.image
+                        }`}
                         alt={item.name}
                         className="w-12 h-12 object-cover rounded"
                       />

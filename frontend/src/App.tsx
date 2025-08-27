@@ -20,6 +20,8 @@ import { ThemeProvider } from "./context/theme-provider.tsx";
 import Orders from "./pages/Orders.tsx";
 import Profile from "./pages/Profile.tsx";
 import ForgetPassword from "./pages/ForgetPassword.tsx";
+import Wishlist from "./pages/Wishlist.tsx";
+import NotFound from "./pages/NotFound.tsx";
 
 export default function App() {
   const { isAuthenticated, isPending } = useCheckAuth();
@@ -54,6 +56,12 @@ export default function App() {
               path="/profile"
               element={isAuthenticated ? <Profile /> : <Navigate to="/login" />}
             />
+            <Route
+              path="/wishlist"
+              element={
+                isAuthenticated ? <Wishlist /> : <Navigate to="/login" />
+              }
+            />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/products" element={<Products />} />
@@ -80,6 +88,7 @@ export default function App() {
               path="/orders"
               element={isAuthenticated ? <Orders /> : <Navigate to="/login" />}
             />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </Layout>
         <Toaster richColors closeButton toastOptions={{ duration: 3000 }} />

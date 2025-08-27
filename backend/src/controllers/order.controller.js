@@ -1,17 +1,8 @@
 import Order from "../models/order.js";
 import Cart from "../models/cart.js";
 import Product from "../models/product.js";
-import User from "../models/user.js"; // Import User model
-import nodemailer from "nodemailer";
-
-// Create nodemailer transporter (reuse your existing one)
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASSWORD,
-  },
-});
+import User from "../models/user.js";
+import { sendEmail, emailTemplates } from "../utils/email.js";
 
 // Create a new order
 export const createOrder = async (req, res) => {
@@ -98,7 +89,15 @@ export const createOrder = async (req, res) => {
 
     // Send order confirmation email
     try {
-      await sendOrderConfirmationEmail(user, order, shippingAddress);
+      await sendEmail(
+        shippingAddress.email,
+        `Order Confirmation - ${order.orderNumber}`,
+        emailTemplates.generateOrderConfirmationEmail(
+          user,
+          order,
+          shippingAddress
+        )
+      );
     } catch (emailError) {
       console.error("Failed to send order confirmation email:", emailError);
       // Don't fail the order creation if email fails
@@ -114,195 +113,6 @@ export const createOrder = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
-
-// Email sending function
-async function sendOrderConfirmationEmail(user, order, shippingAddress) {
-  const mailOptions = {
-    from: `"ShopSphere" <${process.env.EMAIL_USER}>`,
-    to: shippingAddress.email,
-    subject: `Order Confirmation - ${order.orderNumber}`,
-    html: generateOrderConfirmationEmail(user, order, shippingAddress),
-  };
-
-  await transporter.sendMail(mailOptions);
-}
-
-// Email template generator
-function generateOrderConfirmationEmail(user, order, shippingAddress) {
-  const itemsHtml = order.items
-    .map(
-      (item) => `
-    <tr>
-      <td style="padding: 12px; border-bottom: 1px solid #eee; text-align: left;">
-        <img src="${process.env.BACKEND_URL}/${item.image}" alt="${
-        item.name
-      }" width="60" style="border-radius: 4px;">
-      </td>
-      <td style="padding: 12px; border-bottom: 1px solid #eee; text-align: left;">
-        <div style="font-weight: 600;">${item.name}</div>
-        <div style="color: #666; font-size: 14px;">Qty: ${item.quantity}</div>
-      </td>
-      <td style="padding: 12px; border-bottom: 1px solid #eee; text-align: right;">
-        $${(item.price * item.quantity).toFixed(2)}
-      </td>
-    </tr>
-  `
-    )
-    .join("");
-
-  return `
-    <div style="font-family: Arial, sans-serif; background-color: #f9fafb; padding: 40px 20px;">
-      <div style="max-width: 600px; margin: auto; background: #ffffff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-        
-        <!-- Header -->
-        <div style="background: linear-gradient(135deg, #DD7F1A, #FF9F43); padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
-          <h1 style="color: white; margin: 0; font-size: 28px;">Order Confirmed! 🎉</h1>
-          <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0; font-size: 16px;">
-            Thank you for your purchase, ${user.name}!
-          </p>
-        </div>
-
-        <!-- Order Details -->
-        <div style="padding: 30px;">
-          <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 25px;">
-            <h2 style="color: #333; margin: 0 0 15px; font-size: 18px;">Order Summary</h2>
-            <p style="margin: 5px 0; color: #666;">
-              <strong>Order Number:</strong> ${order.orderNumber}
-            </p>
-            <p style="margin: 5px 0; color: #666;">
-              <strong>Order Date:</strong> ${new Date().toLocaleDateString()}
-            </p>
-            <p style="margin: 5px 0; color: #666;">
-              <strong>Status:</strong> <span style="color: #10b981; font-weight: 600;">Confirmed</span>
-            </p>
-          </div>
-
-          <!-- Order Items -->
-          <h3 style="color: #333; margin: 0 0 15px; font-size: 16px;">Items Ordered</h3>
-          <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px;">
-            <thead>
-              <tr>
-                <th style="padding: 12px; border-bottom: 2px solid #eee; text-align: left; width: 80px;">Image</th>
-                <th style="padding: 12px; border-bottom: 2px solid #eee; text-align: left;">Product</th>
-                <th style="padding: 12px; border-bottom: 2px solid #eee; text-align: right;">Price</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${itemsHtml}
-            </tbody>
-          </table>
-
-          <!-- Order Totals -->
-          <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 25px;">
-            <div style="display: flex; justify-content: space-between; margin: 8px 0;">
-              <span style="color: #666;">Subtotal:</span>
-              <span style="font-weight: 600;">$${order.subtotal.toFixed(
-                2
-              )}</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; margin: 8px 0;">
-              <span style="color: #666;">Shipping:</span>
-              <span style="font-weight: 600;">${
-                order.shippingCost === 0
-                  ? "Free"
-                  : `$${order.shippingCost.toFixed(2)}`
-              }</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; margin: 8px 0;">
-              <span style="color: #666;">Tax:</span>
-              <span style="font-weight: 600;">$${order.tax.toFixed(2)}</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; margin: 8px 0; padding-top: 15px; border-top: 2px solid #ddd;">
-              <span style="color: #333; font-weight: 700; font-size: 18px;">Total:</span>
-              <span style="color: #DD7F1A; font-weight: 700; font-size: 18px;">$${order.total.toFixed(
-                2
-              )}</span>
-            </div>
-          </div>
-
-          <!-- Shipping Information -->
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 25px;">
-            <div>
-              <h3 style="color: #333; margin: 0 0 15px; font-size: 16px;">Shipping Address</h3>
-              <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
-                <p style="margin: 5px 0; color: #666;">
-                  <strong>${shippingAddress.firstName} ${
-    shippingAddress.lastName
-  }</strong>
-                </p>
-                <p style="margin: 5px 0; color: #666;">${
-                  shippingAddress.address
-                }</p>
-                <p style="margin: 5px 0; color: #666;">
-                  ${shippingAddress.city}, ${shippingAddress.state} ${
-    shippingAddress.zipCode
-  }
-                </p>
-                <p style="margin: 5px 0; color: #666;">${
-                  shippingAddress.country
-                }</p>
-                <p style="margin: 5px 0; color: #666;">📞 ${
-                  shippingAddress.phone
-                }</p>
-              </div>
-            </div>
-
-            <div>
-              <h3 style="color: #333; margin: 0 0 15px; font-size: 16px;">Shipping Method</h3>
-              <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
-                <p style="margin: 5px 0; color: #666;">
-                  <strong>${order.shippingMethod.name}</strong>
-                </p>
-                <p style="margin: 5px 0; color: #666;">
-                  Estimated Delivery: ${order.shippingMethod.delivery}
-                </p>
-                <p style="margin: 5px 0; color: #666;">
-                  Shipping Cost: ${
-                    order.shippingCost === 0
-                      ? "Free"
-                      : `$${order.shippingCost.toFixed(2)}`
-                  }
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Payment Information -->
-          <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
-            <h3 style="color: #333; margin: 0 0 15px; font-size: 16px;">Payment Information</h3>
-            <p style="margin: 5px 0; color: #666;">
-              <strong>Payment Method:</strong> ${order.paymentMethod}
-            </p>
-            <p style="margin: 5px 0; color: #666;">
-              <strong>Payment Status:</strong> <span style="color: #10b981; font-weight: 600;">Completed</span>
-            </p>
-          </div>
-
-          <!-- Next Steps -->
-          <div style="text-align: center; margin-top: 30px; padding-top: 25px; border-top: 1px solid #eee;">
-            <h3 style="color: #333; margin: 0 0 15px;">What's Next?</h3>
-            <p style="color: #666; margin: 0 0 20px;">
-              We'll send you another email when your order ships. You can also check your order status anytime in your account.
-            </p>
-            <a href="${process.env.FRONTEND_URL}/orders" 
-               style="display: inline-block; background-color: #DD7F1A; color: white; 
-                      padding: 12px 30px; border-radius: 8px; text-decoration: none; font-weight: 600;">
-              View Order Details
-            </a>
-          </div>
-        </div>
-
-        <!-- Footer -->
-        <div style="background: #f8f9fa; padding: 20px; text-align: center; border-radius: 0 0 12px 12px;">
-          <p style="color: #999; margin: 0; font-size: 14px;">
-            Thank you for shopping with ShopSphere!<br>
-            If you have any questions, please contact our support team.
-          </p>
-        </div>
-      </div>
-    </div>
-  `;
-}
 
 // Get user's orders
 export const getOrders = async (req, res) => {

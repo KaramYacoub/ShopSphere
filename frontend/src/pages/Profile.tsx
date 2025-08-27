@@ -40,7 +40,7 @@ const profileSchema = z.object({
 const securitySchema = z
   .object({
     currentPassword: z.string().min(1, "Current password is required"),
-    newPassword: z.string().min(8, "Password must be at least 8 characters"),
+    newPassword: z.string().min(6, "Password must be at least 6 characters"),
   })
   .refine((data) => !!data.currentPassword || !!data.newPassword, {
     message: "Both fields are required",

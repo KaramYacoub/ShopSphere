@@ -14,6 +14,7 @@ export interface ProductCardProps {
     categoryName: string;
     createdAt: string;
   };
+  onWishlistUpdate?: () => void;
   isAuthenticated?: boolean;
 }
 

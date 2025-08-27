@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,17 +13,39 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
+import { useCheckAuth, useContactUs } from "@/hooks/useAuth";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const contactSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Please enter a valid email address"),
+  subject: z.string().min(5, "Subject must be at least 5 characters"),
+  message: z.string().min(10, "Message must be at least 10 characters"),
+});
+
+type ContactFormData = z.infer<typeof contactSchema>;
 
 export default function Contact() {
   const { t, i18n } = useTranslation();
   const dir = i18n.dir();
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    subject: "",
-    message: "",
+  const { user, isAuthenticated } = useCheckAuth();
+  const { contactUsMutation, isPending } = useContactUs();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<ContactFormData>({
+    resolver: zodResolver(contactSchema),
+    defaultValues: {
+      name: isAuthenticated ? user.name : "",
+      email: isAuthenticated ? user.email : "",
+      subject: "",
+      message: "",
+    },
   });
-  const [isSubmitted, setIsSubmitted] = useState(false);
 
   const fadeUp = {
     initial: { opacity: 0, y: 12 },
@@ -44,25 +65,13 @@ export default function Contact() {
     transition: { duration: 0.5 },
   };
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Form submitted:", formData);
-    setIsSubmitted(true);
-
-    setTimeout(() => {
-      setIsSubmitted(false);
-      setFormData({ name: "", email: "", subject: "", message: "" });
-    }, 3000);
+  const onSubmit = (data: ContactFormData) => {
+    console.log(data);
+    contactUsMutation(data, {
+      onSuccess: () => {
+        reset();
+      },
+    });
   };
 
   return (
@@ -203,7 +212,7 @@ export default function Contact() {
             </p>
           </div>
 
-          {isSubmitted ? (
+          {isPending ? (
             <Card className="text-center py-12">
               <CardContent className="space-y-4">
                 <CheckCircle className="h-16 w-16 text-green-500 mx-auto" />
@@ -230,7 +239,7 @@ export default function Contact() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <form onSubmit={handleSubmit} className="space-y-6">
+                  <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                     <div className="grid gap-4 md:grid-cols-2">
                       <div className="space-y-2">
                         <Label htmlFor="name">
@@ -238,13 +247,16 @@ export default function Contact() {
                         </Label>
                         <Input
                           id="name"
-                          name="name"
                           type="text"
-                          required
-                          value={formData.name}
-                          onChange={handleInputChange}
+                          disabled={isAuthenticated}
                           placeholder={t("contact.form.name.placeholder")}
+                          {...register("name")}
                         />
+                        {errors.name && (
+                          <p className="text-sm text-red-500">
+                            {errors.name.message}
+                          </p>
+                        )}
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="email">
@@ -252,13 +264,16 @@ export default function Contact() {
                         </Label>
                         <Input
                           id="email"
-                          name="email"
                           type="email"
-                          required
-                          value={formData.email}
-                          onChange={handleInputChange}
+                          disabled={isAuthenticated}
                           placeholder={t("contact.form.email.placeholder")}
+                          {...register("email")}
                         />
+                        {errors.email && (
+                          <p className="text-sm text-red-500">
+                            {errors.email.message}
+                          </p>
+                        )}
                       </div>
                     </div>
 
@@ -268,13 +283,15 @@ export default function Contact() {
                       </Label>
                       <Input
                         id="subject"
-                        name="subject"
                         type="text"
-                        required
-                        value={formData.subject}
-                        onChange={handleInputChange}
                         placeholder={t("contact.form.subject.placeholder")}
+                        {...register("subject")}
                       />
+                      {errors.subject && (
+                        <p className="text-sm text-red-500">
+                          {errors.subject.message}
+                        </p>
+                      )}
                     </div>
 
                     <div className="space-y-2">
@@ -283,18 +300,31 @@ export default function Contact() {
                       </Label>
                       <textarea
                         id="message"
-                        name="message"
-                        required
-                        value={formData.message}
-                        onChange={handleInputChange}
                         placeholder={t("contact.form.message.placeholder")}
                         className="w-full min-h-[120px] px-3 py-2 border border-input rounded-md bg-background text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                        {...register("message")}
                       />
+                      {errors.message && (
+                        <p className="text-sm text-red-500">
+                          {errors.message.message}
+                        </p>
+                      )}
                     </div>
 
-                    <Button type="submit" className="w-full gap-2" size="lg">
-                      <Send className="h-4 w-4" />
-                      {t("contact.form.submit")}
+                    <Button
+                      type="submit"
+                      className="w-full gap-2"
+                      size="lg"
+                      disabled={isPending}
+                    >
+                      {isPending ? (
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      ) : (
+                        <Send className="h-4 w-4" />
+                      )}
+                      {isPending
+                        ? t("contact.form.submitting")
+                        : t("contact.form.submit")}
                     </Button>
                   </form>
                 </CardContent>

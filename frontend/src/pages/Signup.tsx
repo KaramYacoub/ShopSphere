@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useSignup } from "../hooks/useAuth";
 import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,11 +11,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Mail, Lock, User2, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-type SignupForm = {
-  name: string;
-  email: string;
-  password: string;
-};
+// Define form validation schema
+const signupSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
+type SignupData = z.infer<typeof signupSchema>;
 
 export default function Signup() {
   const { t } = useTranslation();
@@ -24,9 +29,11 @@ export default function Signup() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<SignupForm>();
+  } = useForm<SignupData>({
+    resolver: zodResolver(signupSchema),
+  });
 
-  const onSubmit = (data: SignupForm) => {
+  const onSubmit = (data: SignupData) => {
     signupMutation(data);
   };
 
@@ -53,7 +60,7 @@ export default function Signup() {
                 <Input
                   id="name"
                   placeholder="Your name"
-                  {...register("name", { required: "Name is required" })}
+                  {...register("name")}
                   className="pl-9 h-11"
                 />
               </div>
@@ -71,13 +78,7 @@ export default function Signup() {
                   id="email"
                   type="email"
                   placeholder="you@example.com"
-                  {...register("email", {
-                    required: "Email is required",
-                    pattern: {
-                      value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                      message: "Invalid email format",
-                    },
-                  })}
+                  {...register("email")}
                   className="pl-9 h-11"
                 />
               </div>
@@ -95,10 +96,7 @@ export default function Signup() {
                   id="password"
                   type={showPassword ? "text" : "password"}
                   placeholder="********"
-                  {...register("password", {
-                    required: "Password is required",
-                    minLength: { value: 6, message: "Min 6 characters" },
-                  })}
+                  {...register("password")}
                   className="pl-9 pr-10 h-11"
                 />
                 <button

@@ -80,6 +80,7 @@
   "contact.form.message.label": "الرسالة",
   "contact.form.message.placeholder": "أخبرني المزيد عن استفسارك...",
   "contact.form.submit": "إرسال الرسالة",
+  "contact.form.submitting": "جاري الإرسال...",
   "contact.form.success.title": "تم إرسال الرسالة بنجاح!",
   "contact.form.success.message": "شكراً لك على التواصل. سأرد عليك خلال 24 ساعة.",
   "contact.creator.title": "اتصال مباشر",
@@ -266,5 +267,42 @@
   "Resetting": "جاري اعادة تعيين...",
   "Remember_password": "هل تتذكر كلمة المرور؟",
   "Back_to_login": "العودة لتسجيل الدخول",
-  "Back": "العودة"
+  "Back": "العودة",
+
+  "wishlist": {
+    "title": "المفضلة",
+    "subtitle": "{{count}} منتجات في المفضلة",
+    "loading": "جاري تحميل المفضلة...",
+    "toolbar": {
+      "sortBy": "ترتيب حسب {{field}}",
+      "sort": {
+        "name": "الاسم",
+        "price": "السعر",
+        "rating": "التقييم",
+        "asc": "A-Z",
+        "desc": "Z-A"
+      }
+    },
+    "empty": {
+      "title": "المفضلة فارغة",
+      "description": "لا يوجد منتجات في المفضلة حتى الان.",
+      "cta": "تصفح المنتجات"
+    }
+  },
+
+  "notFound": {
+    "title": "الصفحة لم يتم العثور عليها",
+    "description": "الصفحة التي تبحث عنها غير موجودة أو تم نقلها.",
+    "actions": {
+      "home": "اذهب للصفحة الرئيسية",
+      "browse": "تصفح المنتجات",
+      "back": "العودة"
+    },
+    "help": {
+      "title": "هل تحتاج إلى مساعدة؟",
+      "description": "إذا كنت تعتقد أن هذا خطأ أو تحتاج إلى مساعدة ، فلا تتردد في التواصل معنا.",
+      "contact": "اتصل بنا",
+      "about": "من نحن"
+    }
+  }
 }

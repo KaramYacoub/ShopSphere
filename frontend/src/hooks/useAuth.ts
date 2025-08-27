@@ -1,6 +1,7 @@
 import { toast } from "sonner";
 import {
   checkAuth,
+  contactUs,
   forgotPassword,
   login,
   logout,
@@ -233,4 +234,37 @@ export function useResetPassword() {
     },
   });
   return { resetPasswordMutation, isPending };
+}
+
+export function useContactUs() {
+  const { mutate: contactUsMutation, isPending } = useMutation({
+    mutationKey: ["contact-us"],
+    mutationFn: (data: {
+      name: string;
+      email: string;
+      subject: string;
+      message: string;
+    }) => contactUs(data),
+    onSuccess: () => {
+      toast.success("Message sent successfully");
+    },
+    onError: (err: unknown) => {
+      if (
+        err &&
+        typeof err === "object" &&
+        "response" in err &&
+        err.response &&
+        typeof err.response === "object" &&
+        "data" in err.response &&
+        err.response.data &&
+        typeof err.response.data === "object" &&
+        "message" in err.response.data
+      ) {
+        toast.error(String(err?.response?.data?.message) || "Failed to send");
+      } else {
+        toast.error("Failed to send");
+      }
+    },
+  });
+  return { contactUsMutation, isPending };
 }

@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useLogin } from "../hooks/useAuth";
 import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,22 +11,26 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-type LoginData = {
-  email: string;
-  password: string;
-};
+// Define form validation schema
+const loginSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(1, "Password is required"),
+});
+
+type LoginData = z.infer<typeof loginSchema>;
 
 export default function Login() {
   const { t } = useTranslation();
   const { loginMutation, isPending } = useLogin();
-
   const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginData>();
+  } = useForm<LoginData>({
+    resolver: zodResolver(loginSchema),
+  });
 
   const onSubmit = (data: LoginData) => {
     loginMutation(data);
@@ -58,7 +64,7 @@ export default function Login() {
                   placeholder="you@example.com"
                   autoComplete="email webauthn"
                   className="pl-9 h-11"
-                  {...register("email", { required: "Email is required" })}
+                  {...register("email")}
                 />
               </div>
               {errors.email && (
@@ -87,9 +93,7 @@ export default function Login() {
                   placeholder="********"
                   autoComplete="current-password webauthn"
                   className="pl-9 pr-10 h-11"
-                  {...register("password", {
-                    required: "Password is required",
-                  })}
+                  {...register("password")}
                 />
                 <button
                   type="button"

@@ -9,13 +9,16 @@ import {
   useRemoveFromCart,
 } from "@/hooks/useCart";
 import { renderStars, renderPrice } from "@/utils/utils";
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import Loader from "@/components/ui/loader";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
-
+import {
+  useAddToWishlist,
+  useRemoveFromWishlist,
+  useWishlistStatus,
+} from "@/hooks/useWishlist";
 export default function Product() {
   const { t, i18n } = useTranslation();
   const { id } = useParams<{ id: string }>();
@@ -39,7 +42,13 @@ export default function Product() {
   const { isAuthenticated } = useCheckAuth();
   const { mutate: addToCart, isPending: isAdding } = useAddToCart();
   const { mutate: removeFromCart, isPending: isRemoving } = useRemoveFromCart();
-  const [isWishlisted, setIsWishlisted] = useState(false);
+
+  const { mutate: addToWishlist, isPending: isAddingToWishlist } =
+    useAddToWishlist();
+  const { mutate: removeFromWishlist, isPending: isRemovingFromWishlist } =
+    useRemoveFromWishlist();
+
+  const { isInWishlist } = useWishlistStatus(_id);
 
   const { isInCart } = useCartStatus(_id);
 
@@ -62,6 +71,36 @@ export default function Product() {
     transition: { duration: 0.5 },
   };
 
+  const handleWishlist = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!isAuthenticated) {
+      toast.error("Please login to manage your wishlist");
+      return;
+    }
+
+    if (isInWishlist) {
+      removeFromWishlist(_id, {
+        onSuccess: () => {
+          toast.success(`${name} removed from wishlist`);
+        },
+        onError: () => {
+          toast.error("Failed to remove from wishlist");
+        },
+      });
+    } else {
+      addToWishlist(_id, {
+        onSuccess: () => {
+          toast.success(`${name} added to wishlist`);
+        },
+        onError: () => {
+          toast.error("Failed to add to wishlist");
+        },
+      });
+    }
+  };
+
   const handleToggleCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -81,19 +120,6 @@ export default function Product() {
     } else {
       addToCart({ productId: _id, quantity: 1 });
     }
-  };
-  const handleWishlist = (product: { name: string }) => {
-    console.log(product);
-    if (!isAuthenticated) {
-      toast.error(t("product.loginToAddWishlist"));
-      return;
-    }
-    setIsWishlisted((prev) => !prev);
-    toast.success(
-      isWishlisted
-        ? t("product.removedFromWishlist", { name: product.name })
-        : t("product.addedToWishlist", { name: product.name })
-    );
   };
 
   if (isLoading) return <Loader />;
@@ -138,7 +164,7 @@ export default function Product() {
           >
             <div className="aspect-square overflow-hidden rounded-lg bg-white">
               <img
-                src={`/${image}`}
+                src={`${import.meta.env.VITE_BACKEND_URL}/${image}`}
                 alt={name}
                 className="w-full h-full object-cover"
               />
@@ -254,14 +280,15 @@ export default function Product() {
                 variant="outline"
                 size="lg"
                 className="gap-2"
-                onClick={() => handleWishlist(product)}
+                onClick={handleWishlist}
+                disabled={isAddingToWishlist || isRemovingFromWishlist}
               >
                 <Heart
                   className={`h-5 w-5 ${
-                    isWishlisted ? "fill-red-500 text-red-500" : ""
+                    isInWishlist ? "fill-red-500 text-red-500" : ""
                   }`}
                 />
-                {isWishlisted
+                {isInWishlist
                   ? t("product.wishlisted")
                   : t("product.addToWishlist")}
               </Button>
