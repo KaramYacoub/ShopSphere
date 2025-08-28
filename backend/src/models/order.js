@@ -124,6 +124,10 @@ const orderSchema = new Schema(
     estimatedDelivery: {
       type: Date,
     },
+    orderNotes: {
+      type: String,
+      required: false,
+    },
   },
   { timestamps: true }
 );

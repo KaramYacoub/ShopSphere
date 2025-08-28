@@ -67,6 +67,7 @@ export const createOrder = async (req, res) => {
       paymentStatus: "completed",
       status: "confirmed",
       estimatedDelivery: calculateEstimatedDelivery(shippingMethod?.delivery),
+      orderNotes,
     });
 
     // Update product stock
@@ -88,19 +89,22 @@ export const createOrder = async (req, res) => {
     const user = await User.findById(req.user._id);
 
     // Send order confirmation email
+    // Get email content with attachments
+    const { html, attachments } = emailTemplates.generateOrderConfirmationEmail(
+      user,
+      order,
+      shippingAddress
+    );
+
     try {
       await sendEmail(
         shippingAddress.email,
         `Order Confirmation - ${order.orderNumber}`,
-        emailTemplates.generateOrderConfirmationEmail(
-          user,
-          order,
-          shippingAddress
-        )
+        html,
+        attachments
       );
     } catch (emailError) {
       console.error("Failed to send order confirmation email:", emailError);
-      // Don't fail the order creation if email fails
     }
 
     res.status(201).json({

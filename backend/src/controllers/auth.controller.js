@@ -45,11 +45,11 @@ export async function signup(req, res) {
     // verification link
     const verificationLink = `${process.env.BACKEND_URL}/api/auth/verify-email?token=${verificationToken}`;
     // send email
-    sendEmail({
-      to: email,
-      subject: "Verify your email - ShopSphere",
-      html: emailTemplates.verifyEmail(user.name, verificationLink),
-    });
+    sendEmail(
+      email,
+      "Verify your email - ShopSphere",
+      emailTemplates.verifyEmail(user.name, verificationLink)
+    );
 
     res.status(201).json({
       success: true,

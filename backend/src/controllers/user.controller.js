@@ -72,11 +72,11 @@ export async function updateProfile(req, res) {
 
       // send confirmation link to NEW email
       const verifyLink = `${process.env.BACKEND_URL}/api/auth/verify-email-change?token=${rawToken}`;
-      await sendEmail({
-        to: email,
-        subject: "Confirm Your New Email - ShopSphere",
-        html: emailTemplates.updateEmail(user.name, verifyLink),
-      });
+      await sendEmail(
+        email,
+        "Confirm Your New Email - ShopSphere",
+        emailTemplates.updateEmail(user.name, verifyLink)
+      );
     }
 
     await user.save();
@@ -215,11 +215,11 @@ export async function forgotPassword(req, res) {
     await user.save();
 
     // Send OTP via email with ShopSphere styling
-    await sendEmail({
-      to: user.email,
-      subject: "Password Reset OTP - ShopSphere",
-      html: emailTemplates.forgotPasswordEmail(user.name, otp),
-    });
+    await sendEmail(
+      user.email,
+      "Password Reset OTP - ShopSphere",
+      emailTemplates.forgotPasswordEmail(user.name, otp)
+    );
 
     return res.status(200).json(genericMsg);
   } catch (err) {
@@ -274,12 +274,11 @@ export async function resetPassword(req, res) {
     await user.save();
 
     // Send confirmation email with ShopSphere styling
-    await sendEmail({
-      from: `"ShopSphere" <${process.env.EMAIL_USER}>`,
-      to: user.email,
-      subject: "Password Changed Successfully - ShopSphere",
-      html: emailTemplates.resetPasswordEmail(user.name),
-    });
+    await sendEmail(
+      user.email,
+      "Password Changed Successfully - ShopSphere",
+      emailTemplates.resetPasswordEmail(user.name)
+    );
 
     return res
       .status(200)
