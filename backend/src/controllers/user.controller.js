@@ -1,5 +1,8 @@
 import bcrypt from "bcryptjs";
 import User from "../models/user.js";
+import WishList from "../models/wishlist.js";
+import Order from "../models/order.js";
+import Cart from "../models/cart.js";
 import crypto from "crypto";
 import { generateOTP, hashToken } from "../utils/security.js";
 import { emailTemplates, sendEmail, receiveEmail } from "../utils/email.js";
@@ -323,6 +326,31 @@ export async function contactUs(req, res) {
       .json({ success: true, message: "Message sent successfully" });
   } catch (err) {
     console.error("Error in contactUs:", err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+// delete account
+export async function deleteAccount(req, res) {
+  try {
+    const userId = req.user.id;
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    await WishList.deleteMany({ userId: userId });
+    await Order.deleteMany({ userId: userId });
+    await Cart.deleteMany({ userId: userId });
+    await User.findByIdAndDelete(userId);
+    return res
+      .status(200)
+      .json({ success: true, message: "Account deleted successfully" });
+  } catch (err) {
+    console.error("Error in deleteAccount:", err);
     return res.status(500).json({ message: "Internal server error" });
   }
 }

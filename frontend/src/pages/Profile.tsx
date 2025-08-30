@@ -24,13 +24,30 @@ import {
   Shield,
   ChevronRight,
   CheckCircle2,
+  Trash2,
+  AlertTriangle,
 } from "lucide-react";
-import { useCheckAuth, useUpdateProfile } from "@/hooks/useAuth";
+import {
+  useCheckAuth,
+  useUpdateProfile,
+  useDeleteAccount,
+} from "@/hooks/useAuth";
 import { useTranslation } from "react-i18next";
 import Loader from "@/components/ui/loader";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const profileSchema = z.object({
   name: z.string().min(2, "Name is required"),
@@ -54,9 +71,12 @@ export default function Profile() {
   const { user, isPending } = useCheckAuth();
   const { updateProfileMutation, isPending: isUpdatePending } =
     useUpdateProfile();
+  const { deleteAccountMutation, isPending: isDeletePending } =
+    useDeleteAccount();
   const [showPassword, setShowPassword] = useState(false);
   const [activeTab, setActiveTab] = useState("profile");
   const [showSuccess, setShowSuccess] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const {
     register: registerProfile,
@@ -106,6 +126,15 @@ export default function Profile() {
         },
       }
     );
+  };
+
+  const handleDeleteAccount = () => {
+    deleteAccountMutation(undefined, {
+      onSuccess: () => {
+        setShowDeleteDialog(false);
+        // User will be redirected by the hook or authentication system
+      },
+    });
   };
 
   const formatDate = (dateString: string) => {
@@ -206,6 +235,48 @@ export default function Profile() {
                     {formatDate(user?.updatedAt)}
                   </span>
                 </div>
+
+                {/* Delete Account Button */}
+                <Separator className="my-4" />
+                <AlertDialog
+                  open={showDeleteDialog}
+                  onOpenChange={setShowDeleteDialog}
+                >
+                  <AlertDialogTrigger asChild>
+                    <Button variant="destructive" className="w-full mt-2">
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      {t("Delete_Account")}
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle className="flex items-center gap-2">
+                        <AlertTriangle className="h-5 w-5 text-destructive" />
+                        {t("Are_you_sure")}
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        {t("Delete_Account_Confirmation")}
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>{t("Cancel")}</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={handleDeleteAccount}
+                        disabled={isDeletePending}
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      >
+                        {isDeletePending ? (
+                          <span className="flex items-center gap-2">
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            {t("Deleting")}
+                          </span>
+                        ) : (
+                          t("Delete_Account")
+                        )}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
             </CardContent>
           </Card>

@@ -72,3 +72,8 @@ export const contactUs = async (data: {
   const res = await axiosInstance.post("/user/contact-us", data);
   return res.data;
 };
+
+export const deleteAccount = async () => {
+  const res = await axiosInstance.delete("/user/delete-account");
+  return res.data;
+};

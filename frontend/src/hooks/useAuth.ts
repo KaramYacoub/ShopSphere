@@ -2,6 +2,7 @@ import { toast } from "sonner";
 import {
   checkAuth,
   contactUs,
+  deleteAccount,
   forgotPassword,
   login,
   logout,
@@ -267,4 +268,35 @@ export function useContactUs() {
     },
   });
   return { contactUsMutation, isPending };
+}
+
+export function useDeleteAccount() {
+  const { mutate: deleteAccountMutation, isPending } = useMutation({
+    mutationKey: ["delete-account"],
+    mutationFn: deleteAccount,
+    onSuccess: () => {
+      toast.success("Account deleted successfully");
+      setTimeout(() => {
+        window.location.href = "/login";
+      }, 2000);
+    },
+    onError: (err: unknown) => {
+      if (
+        err &&
+        typeof err === "object" &&
+        "response" in err &&
+        err.response &&
+        typeof err.response === "object" &&
+        "data" in err.response &&
+        err.response.data &&
+        typeof err.response.data === "object" &&
+        "message" in err.response.data
+      ) {
+        toast.error(String(err?.response?.data?.message) || "Failed to delete");
+      } else {
+        toast.error("Failed to delete");
+      }
+    },
+  });
+  return { deleteAccountMutation, isPending };
 }

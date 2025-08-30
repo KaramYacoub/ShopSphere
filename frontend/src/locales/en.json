@@ -256,6 +256,11 @@
   "Update_Password": "Update Password",
   "Saving": "Saving...",
   "Save_Changes": "Save Changes",
+  "Delete_Account": "Delete Account",
+  "Are_you_sure": "Are you sure?",
+  "Delete_Account_Confirmation": "This action cannot be undone. This will permanently delete your account and remove all your data.",
+  "Cancel": "Cancel",
+  "Deleting": "Deleting...",
 
   "Reset_password": "Reset Password",
   "Enter_email_to_reset": "Enter your email to reset your password",

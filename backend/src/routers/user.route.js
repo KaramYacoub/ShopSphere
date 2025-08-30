@@ -4,6 +4,7 @@ import {
   forgotPassword,
   verifyEmailChange,
   contactUs,
+  deleteAccount,
 } from "../controllers/user.controller.js";
 import { protectRoute } from "../middlewares/auth.middleware.js";
 
@@ -23,5 +24,8 @@ router.get("/verify-email-change", verifyEmailChange);
 
 // contact us
 router.post("/contact-us", contactUs);
+
+// delete account
+router.delete("/delete-account", protectRoute, deleteAccount);
 
 export default router;
