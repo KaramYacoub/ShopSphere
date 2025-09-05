@@ -136,7 +136,7 @@ function ProductCard({
       >
         {/* Main Image */}
         <img
-          src={`${import.meta.env.VITE_BACKEND_URL}/${image}`}
+          src={`${image}`}
           alt={name}
           className="absolute inset-0 w-full h-full object-cover"
         />

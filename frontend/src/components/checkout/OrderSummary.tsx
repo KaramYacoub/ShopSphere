@@ -2,12 +2,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Lock } from "lucide-react";
 import { renderPrice } from "@/utils/utils";
-import type { Cart } from "@/types/types";
-
-interface OrderSummaryProps {
-  cart: Cart;
-  shippingCost: number;
-}
+import type { OrderSummaryProps } from "@/types/types";
 
 export function OrderSummary({ cart, shippingCost }: OrderSummaryProps) {
   const tax = cart.total * 0.08;
@@ -24,7 +19,7 @@ export function OrderSummary({ cart, shippingCost }: OrderSummaryProps) {
             <div key={item._id} className="flex justify-between">
               <div className="flex gap-2">
                 <img
-                  src={`${import.meta.env.VITE_BACKEND_URL}/${item.image}`}
+                  src={item.image}
                   alt={item.name}
                   className="w-10 h-10 rounded"
                 />

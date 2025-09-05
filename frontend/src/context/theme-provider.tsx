@@ -1,23 +1,9 @@
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  type ReactNode,
-} from "react";
-
-type Theme = "dark" | "light" | "system";
-
-type ThemeProviderProps = {
-  children: ReactNode;
-  defaultTheme?: Theme;
-  storageKey?: string;
-};
-
-type ThemeProviderState = {
-  theme: Theme;
-  setTheme: (theme: Theme) => void;
-};
+import { createContext, useContext, useEffect, useState } from "react";
+import type {
+  Theme,
+  ThemeProviderProps,
+  ThemeProviderState,
+} from "@/types/types";
 
 const initialState: ThemeProviderState = {
   theme: "system",

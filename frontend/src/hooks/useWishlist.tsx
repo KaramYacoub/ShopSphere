@@ -4,15 +4,10 @@ import {
   addToWishlist,
   removeFromWishlist,
 } from "@/lib/api/wishlist";
-import type { ProductCardProps } from "@/types/types";
+import type { ProductCardProps, PaginationParams } from "@/types/types";
 import { useCheckAuth } from "./useAuth";
 
-export const useWishlist = (queryParams: {
-  page: number | undefined;
-  limit: number | undefined;
-  sortBy: string | undefined;
-  sortOrder: string | undefined;
-}) => {
+export const useWishlist = (queryParams: PaginationParams) => {
   return useQuery({
     queryKey: ["wishlist", queryParams],
     queryFn: () => getWishlist(queryParams),

@@ -12,7 +12,7 @@ import { ChevronDown } from "lucide-react";
 import { useCheckAuth } from "@/hooks/useAuth";
 import { useWishlist } from "@/hooks/useWishlist";
 import ProductCard from "@/components/productCard";
-import type { ProductCardProps } from "@/types/types";
+import type { ProductCardProps, PaginationParams } from "@/types/types";
 import ProductPagination from "@/components/Pagination";
 
 import { motion } from "framer-motion";
@@ -33,11 +33,11 @@ export default function Wishlist() {
   const [currentPage, setCurrentPage] = useState(1);
 
   // Build query parameters
-  const queryParams = {
+  const queryParams: PaginationParams = {
     page: currentPage,
     limit: 9,
-    sortBy,
-    sortOrder,
+    sortBy: sortBy as string,
+    sortOrder: sortOrder as string,
   };
 
   // Fetch wishlist data

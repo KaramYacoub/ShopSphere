@@ -1,43 +1,11 @@
 import { useLocation, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Download, ShoppingBag } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { renderPrice } from "@/utils/utils";
-import { motion } from "framer-motion";
+import { CheckCircle, Download, ShoppingBag } from "lucide-react";
 import { useTranslation } from "react-i18next";
-
-interface OrderItem {
-  _id: string;
-  name: string;
-  image: string;
-  price: number;
-  quantity: number;
-}
-
-interface Order {
-  _id: string;
-  orderNumber: string;
-  items: OrderItem[];
-  total: number;
-  shippingAddress: {
-    firstName: string;
-    lastName: string;
-    email: string;
-    address: string;
-    city: string;
-    state: string;
-    zipCode: string;
-    country: string;
-  };
-  shippingMethod: {
-    name: string;
-    price: number;
-    delivery: string;
-  };
-  paymentMethod: string;
-  createdAt: string;
-  estimatedDelivery: string;
-}
+import { motion } from "framer-motion";
+import type { Order } from "@/types/types";
+import { renderPrice } from "@/utils/utils";
 
 function OrderConfirmation() {
   const { t, i18n } = useTranslation();
@@ -93,8 +61,9 @@ function OrderConfirmation() {
     );
   }
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+  const formatDate = (dateValue: string | Date) => {
+    const date = typeof dateValue === "string" ? new Date(dateValue) : dateValue;
+    return date.toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
       day: "numeric",
@@ -159,7 +128,7 @@ function OrderConfirmation() {
                   </div>
                   <div className="flex justify-between">
                     <span>{t("Order.summary.estimated.delivery")}</span>
-                    <span>{order.estimatedDelivery}</span>
+                    <span>{formatDate(order.estimatedDelivery)}</span>
                   </div>
                 </div>
               </CardContent>
@@ -211,9 +180,7 @@ function OrderConfirmation() {
                       transition={{ delay: index * 0.1 }}
                     >
                       <img
-                        src={`${import.meta.env.VITE_BACKEND_URL}/${
-                          item.image
-                        }`}
+                        src={item.image}
                         alt={item.name}
                         className="w-12 h-12 object-cover rounded"
                       />

@@ -136,9 +136,7 @@ export default function Cart() {
                   <CardContent className="p-4">
                     <div className="flex items-center gap-4">
                       <img
-                        src={`${import.meta.env.VITE_BACKEND_URL}/${
-                          item.image
-                        }`}
+                        src={item.image}
                         alt={item.name}
                         className="w-16 h-16 object-cover rounded"
                       />

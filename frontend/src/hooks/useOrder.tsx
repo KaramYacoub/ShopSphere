@@ -2,31 +2,11 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import api from "@/lib/axios";
 import { toast } from "sonner";
-
-type orderData = {
-  shippingAddress: {
-    firstName: string;
-    lastName: string;
-    email: string;
-    phone: string;
-    address: string;
-    city: string;
-    state: string;
-    zipCode: string;
-    country: string;
-  };
-  shippingMethod: {
-    name: string;
-    price: number;
-    delivery: string;
-  };
-  paymentMethod: string;
-  orderNotes: string;
-};
+import type { CreateOrderData } from "@/types/types";
 
 export const useCreateOrder = () => {
   return useMutation({
-    mutationFn: (orderData: orderData) =>
+    mutationFn: (orderData: CreateOrderData) =>
       api.post("/orders", orderData).then((res) => res.data),
     onSuccess: () => {},
     onError: (err: unknown) => {

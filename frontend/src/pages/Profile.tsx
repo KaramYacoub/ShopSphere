@@ -63,9 +63,6 @@ const securitySchema = z
     message: "Both fields are required",
   });
 
-type ProfileData = z.infer<typeof profileSchema>;
-type SecurityData = z.infer<typeof securitySchema>;
-
 export default function Profile() {
   const { t } = useTranslation();
   const { user, isPending } = useCheckAuth();
@@ -83,7 +80,7 @@ export default function Profile() {
     handleSubmit: handleProfileSubmit,
     formState: { errors: profileErrors },
     reset: resetProfile,
-  } = useForm<ProfileData>({
+  } = useForm<z.infer<typeof profileSchema>>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
       name: user?.name || "",
@@ -96,11 +93,11 @@ export default function Profile() {
     handleSubmit: handleSecuritySubmit,
     formState: { errors: securityErrors },
     reset: resetSecurity,
-  } = useForm<SecurityData>({
+  } = useForm<z.infer<typeof securitySchema>>({
     resolver: zodResolver(securitySchema),
   });
 
-  const onProfileSubmit = (data: ProfileData) => {
+  const onProfileSubmit = (data: z.infer<typeof profileSchema>) => {
     updateProfileMutation(
       { name: data.name, email: data.email },
       {
@@ -112,7 +109,7 @@ export default function Profile() {
     );
   };
 
-  const onSecuritySubmit = (data: SecurityData) => {
+  const onSecuritySubmit = (data: z.infer<typeof securitySchema>) => {
     updateProfileMutation(
       {
         currentPassword: data.currentPassword,

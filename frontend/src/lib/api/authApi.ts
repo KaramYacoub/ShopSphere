@@ -1,14 +1,5 @@
 import axiosInstance from "@/lib/axios";
-
-interface SignupData {
-  name: string;
-  email: string;
-  password: string;
-}
-interface LoginData {
-  email: string;
-  password: string;
-}
+import type { SignupData, LoginData } from "@/types/types";
 
 export const signup = async (data: SignupData) => {
   const res = await axiosInstance.post("/auth/signup", data);

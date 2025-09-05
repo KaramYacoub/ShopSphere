@@ -6,8 +6,9 @@ import {
   getAllProducts,
   getRandomThreeFeatureProducts,
 } from "@/lib/api/shared";
+import type { ProductFilters } from "@/types/types";
 
-export function useAllProducts(params = {}) {
+export function useAllProducts(params: ProductFilters = {}) {
   return useQuery({
     queryKey: ["all-products-public", params],
     queryFn: () => getAllProducts(params),

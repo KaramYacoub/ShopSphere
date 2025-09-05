@@ -2,17 +2,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Truck } from "lucide-react";
 import { renderPrice } from "@/utils/utils";
-
-interface ShippingMethodProps {
-  shippingMethod: string;
-  setShippingMethod: (method: string) => void;
-  shippingMethods: {
-    id: string;
-    name: string;
-    price: number;
-    delivery: string;
-  }[];
-}
+import type { ShippingMethodProps } from "@/types/types";
 
 export function ShippingMethod({
   shippingMethod,

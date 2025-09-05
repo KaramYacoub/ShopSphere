@@ -1,5 +1,5 @@
 import express from "express";
-import upload from "../config/multer.js";
+import upload from "../config/cloudinary.js";
 
 const router = express.Router();
 
@@ -7,7 +7,8 @@ router.post("/", upload.single("image"), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ message: "No file uploaded" });
   }
-  const imageUrl = `${process.env.BACKEND_URL}/uploads/${req.file.filename}`;
+  // Cloudinary returns the secure URL directly
+  const imageUrl = req.file.path;
   res.json({ imageUrl });
 });
 

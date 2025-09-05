@@ -1,12 +1,7 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import type { ShippingFormData } from "@/pages/Checkout";
+import type { ShippingFormProps } from "@/types/types";
 import { MapPin } from "lucide-react";
-import type { UseFormReturn } from "react-hook-form";
-
-interface ShippingFormProps {
-  form: UseFormReturn<ShippingFormData>;
-}
 
 export function ShippingForm({ form }: ShippingFormProps) {
   const {

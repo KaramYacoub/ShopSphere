@@ -5,6 +5,13 @@ import Order from "../models/order.js";
 import Category from "../models/category.js";
 import Wishlist from "../models/wishlist.js";
 import Cart from "../models/cart.js";
+import { uploadImage } from "../config/cloudinary.js";
+import path from "path";
+import { fileURLToPath } from "url";
+import fs from "fs";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const mockProducts = [
   {
@@ -529,7 +536,23 @@ async function seedDB() {
     for (let product of mockProducts) {
       const categoryInfo = categoryMap[product.category];
 
-      product.image = `uploads/${product.name}.jpeg`;
+      // Upload image to Cloudinary
+      const imagePath = path.join(__dirname, "..", "uploads", `${product.name}.jpeg`);
+      let imageUrl = `uploads/${product.name}.jpeg`; // fallback
+      
+      if (fs.existsSync(imagePath)) {
+        try {
+          console.log(`Uploading ${product.name} to Cloudinary...`);
+          imageUrl = await uploadImage(imagePath, `product-${product.name.toLowerCase().replace(/\s+/g, '-')}`);
+          console.log(`✅ Uploaded: ${imageUrl}`);
+        } catch (error) {
+          console.error(`❌ Failed to upload ${product.name}:`, error.message);
+        }
+      } else {
+        console.warn(`⚠️ Image not found: ${imagePath}`);
+      }
+
+      product.image = imageUrl;
       product.onSale = Math.random() < 0.3; // 30% chance of being on sale
       product.isFeatured = Math.random() < 0.2; // 20% chance featured
       product.rating = Math.floor(Math.random() * 5) + 1; // 1-5 stars

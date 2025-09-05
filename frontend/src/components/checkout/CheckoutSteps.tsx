@@ -1,6 +1,4 @@
-interface CheckoutStepsProps {
-  step: number;
-}
+import type { CheckoutStepsProps } from "@/types/types";
 
 export function CheckoutSteps({ step }: CheckoutStepsProps) {
   return (

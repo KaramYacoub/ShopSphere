@@ -152,33 +152,37 @@ export const emailTemplates = {
       .map((item, index) => {
         let imgSrc;
 
-        // In production, always use URL, never try to attach files
-        if (process.env.NODE_ENV === "production") {
-          imgSrc = item.image.startsWith("http")
-            ? item.image
-            : `${process.env.BACKEND_URL}/${basename(item.image)}`;
+        // Use Cloudinary URL directly if it's already a Cloudinary URL
+        if (item.image.startsWith("http") && item.image.includes("cloudinary.com")) {
+          imgSrc = item.image;
+        } else if (item.image.startsWith("http")) {
+          // Other external URLs
+          imgSrc = item.image;
         } else {
-          // local dev: try to attach image from uploads
-          const cid = `product${index}@shop`;
-          imgSrc = `cid:${cid}`;
-          const filePath = join(
-            __dirname,
-            "..",
-            "uploads",
-            basename(item.image)
-          );
-
-          if (fs.existsSync(filePath)) {
-            attachments.push({
-              filename: basename(item.image),
-              path: filePath,
-              cid,
-            });
+          // Fallback for local development or legacy URLs
+          if (process.env.NODE_ENV === "production") {
+            imgSrc = `${process.env.BACKEND_URL}/uploads/${encodeURIComponent(basename(item.image))}`;
           } else {
-            // Fallback to URL if file doesn't exist locally
-            imgSrc = item.image.startsWith("http")
-              ? item.image
-              : `${process.env.BACKEND_URL}/${basename(item.image)}`;
+            // local dev: try to attach image from uploads
+            const cid = `product${index}@shop`;
+            imgSrc = `cid:${cid}`;
+            const filePath = join(
+              __dirname,
+              "..",
+              "uploads",
+              basename(item.image)
+            );
+
+            if (fs.existsSync(filePath)) {
+              attachments.push({
+                filename: basename(item.image),
+                path: filePath,
+                cid,
+              });
+            } else {
+              // Fallback to URL if file doesn't exist locally
+              imgSrc = `${process.env.BACKEND_URL}/uploads/${encodeURIComponent(basename(item.image))}`;
+            }
           }
         }
 

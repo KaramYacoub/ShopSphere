@@ -12,7 +12,7 @@ import { ChevronDown, Package } from "lucide-react";
 import { useCheckAuth } from "@/hooks/useAuth";
 import { useGetOrders } from "@/hooks/useOrder";
 import { motion } from "framer-motion";
-import type { Order } from "@/types/order";
+import type { Order } from "@/types/types";
 import { Link } from "react-router-dom";
 import OrderCard from "@/components/OrderCard";
 

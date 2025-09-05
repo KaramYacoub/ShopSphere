@@ -1,24 +1,17 @@
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ShoppingBag, Heart, Plus } from "lucide-react";
-import { useCheckAuth } from "@/hooks/useAuth";
 import { useProductById } from "@/hooks/useProducts";
-import {
-  useAddToCart,
-  useCartStatus,
-  useRemoveFromCart,
-} from "@/hooks/useCart";
+import { useCheckAuth } from "@/hooks/useAuth";
+import { useAddToCart, useCartStatus, useRemoveFromCart } from "@/hooks/useCart";
+import { useAddToWishlist, useRemoveFromWishlist, useWishlistStatus } from "@/hooks/useWishlist";
 import { renderStars, renderPrice } from "@/utils/utils";
-import { Link } from "react-router-dom";
-import Loader from "@/components/ui/loader";
 import { toast } from "sonner";
-import { motion } from "framer-motion";
-import { useTranslation } from "react-i18next";
-import {
-  useAddToWishlist,
-  useRemoveFromWishlist,
-  useWishlistStatus,
-} from "@/hooks/useWishlist";
+import Loader from "@/components/ui/loader";
+import type { Product } from "@/types/types";
+
 export default function Product() {
   const { t, i18n } = useTranslation();
   const { id } = useParams<{ id: string }>();
@@ -164,7 +157,7 @@ export default function Product() {
           >
             <div className="aspect-square overflow-hidden rounded-lg bg-white">
               <img
-                src={`${import.meta.env.VITE_BACKEND_URL}/${image}`}
+                src={image}
                 alt={name}
                 className="w-full h-full object-cover"
               />

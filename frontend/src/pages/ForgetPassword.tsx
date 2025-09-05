@@ -10,6 +10,7 @@ import { Mail, Lock, Eye, EyeOff, Loader2, ArrowLeft } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useForgotPassword, useResetPassword } from "@/hooks/useAuth";
+import type { ForgotPasswordForm, ResetPasswordForm } from "@/types/types";
 
 // Define form validation schemas
 const forgotPasswordSchema = z.object({
@@ -27,9 +28,6 @@ const resetPasswordSchema = z.object({
       "Password must contain at least one uppercase letter, one lowercase letter, and one number"
     ),
 });
-
-type ForgotPasswordForm = z.infer<typeof forgotPasswordSchema>;
-type ResetPasswordForm = z.infer<typeof resetPasswordSchema>;
 
 export default function ForgotPassword() {
   const { t } = useTranslation();

@@ -1,4 +1,4 @@
-import type { Order } from "@/types/order";
+import type { Order } from "@/types/types";
 import { Calendar, CheckCircle, Package, Truck } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
@@ -86,7 +86,7 @@ export default function OrderCard({ order }: { order: Order }) {
             {order.items.map((item, index) => (
               <div key={index} className="flex items-center gap-4">
                 <img
-                  src={`${import.meta.env.VITE_BACKEND_URL}/${item.image}`}
+                  src={item.image}
                   alt={item.name}
                   className="w-12 h-12 object-cover rounded"
                 />

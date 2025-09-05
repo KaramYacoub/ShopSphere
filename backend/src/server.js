@@ -18,17 +18,10 @@ import cartRouter from "./routers/cart.route.js";
 import orderRoutes from "./routers/order.routes.js";
 import uploadRoutes from "./routers/upload.route.js";
 
-import path from "path";
-import { fileURLToPath } from "url";
-
 const PORT = process.env.PORT;
 
 const app = express();
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use(morgan("dev"));
 

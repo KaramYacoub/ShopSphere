@@ -17,7 +17,7 @@ import { EstimatedDelivery } from "../components/checkout/EstimatedDelivery";
 
 import { useCart } from "@/hooks/useCart";
 import { useCreateOrder } from "@/hooks/useOrder";
-import type { Cart } from "@/types/types";
+import type { Cart, ShippingFormData, PaymentFormData, CreateOrderData } from "@/types/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { useCheckAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
@@ -42,9 +42,6 @@ const paymentSchema = z.object({
   nameOnCard: z.string().min(1, "Name on card is required"),
   orderNotes: z.string().optional(),
 });
-
-export type ShippingFormData = z.infer<typeof shippingSchema>;
-export type PaymentFormData = z.infer<typeof paymentSchema>;
 
 function Checkout() {
   const { i18n } = useTranslation();
@@ -162,8 +159,8 @@ function Checkout() {
     const shippingData = shippingForm.getValues();
     const paymentData = paymentForm.getValues();
 
-    const orderData = {
-      shippingAddress: shippingData,
+    const orderData: CreateOrderData = {
+      shippingAddress: { ...shippingData },
       shippingMethod: {
         name: selectedShipping?.name || "Standard Shipping",
         price: shippingCost,

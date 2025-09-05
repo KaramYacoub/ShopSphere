@@ -2,12 +2,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { CreditCard } from "lucide-react";
-import type { UseFormReturn } from "react-hook-form";
-import type { PaymentFormData } from "@/pages/Checkout";
-
-interface PaymentMethodProps {
-  form: UseFormReturn<PaymentFormData>;
-}
+import type { PaymentMethodProps } from "@/types/types";
 
 export function PaymentMethod({ form }: PaymentMethodProps) {
   const {

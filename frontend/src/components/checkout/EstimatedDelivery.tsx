@@ -1,9 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Calendar } from "lucide-react";
-
-interface EstimatedDeliveryProps {
-  delivery?: string;
-}
+import type { EstimatedDeliveryProps } from "@/types/types";
 
 export function EstimatedDelivery({ delivery }: EstimatedDeliveryProps) {
   return (

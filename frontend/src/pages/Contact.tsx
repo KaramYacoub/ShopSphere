@@ -25,8 +25,6 @@ const contactSchema = z.object({
   message: z.string().min(10, "Message must be at least 10 characters"),
 });
 
-type ContactFormData = z.infer<typeof contactSchema>;
-
 export default function Contact() {
   const { t, i18n } = useTranslation();
   const dir = i18n.dir();
@@ -37,7 +35,7 @@ export default function Contact() {
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm<ContactFormData>({
+  } = useForm<z.infer<typeof contactSchema>>({
     resolver: zodResolver(contactSchema),
     defaultValues: {
       name: isAuthenticated ? user.name : "",
@@ -65,7 +63,7 @@ export default function Contact() {
     transition: { duration: 0.5 },
   };
 
-  const onSubmit = (data: ContactFormData) => {
+  const onSubmit = (data: z.infer<typeof contactSchema>) => {
     console.log(data);
     contactUsMutation(data, {
       onSuccess: () => {

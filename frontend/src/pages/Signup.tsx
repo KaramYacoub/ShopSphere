@@ -14,11 +14,9 @@ import { useTranslation } from "react-i18next";
 // Define form validation schema
 const signupSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
-  email: z.string().email("Invalid email address"),
+  email: z.string().email("Please enter a valid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
-
-type SignupData = z.infer<typeof signupSchema>;
 
 export default function Signup() {
   const { t } = useTranslation();
@@ -29,11 +27,11 @@ export default function Signup() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<SignupData>({
+  } = useForm<z.infer<typeof signupSchema>>({
     resolver: zodResolver(signupSchema),
   });
 
-  const onSubmit = (data: SignupData) => {
+  const onSubmit = (data: z.infer<typeof signupSchema>) => {
     signupMutation(data);
   };
 

@@ -6,6 +6,7 @@ import Cart from "../models/cart.js";
 import crypto from "crypto";
 import { generateOTP, hashToken } from "../utils/security.js";
 import { emailTemplates, sendEmail, receiveEmail } from "../utils/email.js";
+import { isEmail, strongPassword } from "../utils/validators.js";
 
 // update profile
 export async function updateProfile(req, res) {
@@ -74,7 +75,7 @@ export async function updateProfile(req, res) {
       user.isVerified = false;
 
       // send confirmation link to NEW email
-      const verifyLink = `${process.env.BACKEND_URL}/api/auth/verify-email-change?token=${rawToken}`;
+      const verifyLink = `${process.env.BACKEND_URL}/api/user/verify-email-change?token=${rawToken}`;
       await sendEmail(
         email,
         "Confirm Your New Email - ShopSphere",
